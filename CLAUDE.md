@@ -29,9 +29,14 @@ profile works").
   data reaches it via `site["profile"]`, never a second parameter, never an
   imported module-level constant.
 - `python3 -m pytest` must be green before every commit — the traceability
-  suite (standard row <-> `@check` <-> remediation row, once Phase 2 lands)
-  is what keeps the standard/code/remediation triangle from silently
-  drifting apart.
+  suite (standard row <-> `@check` <-> remediation row; engine-owned
+  remediations are the Phase 1 work in `docs/PLAN.md` /
+  `docs/design/engine-owned-remediation.md`) is what keeps the
+  standard/code/remediation triangle from silently drifting apart.
+- Engine evolution that isn't a straightforward check/fix goes through
+  `docs/` first: `docs/PLAN.md` for where a change belongs, `docs/design/`
+  for anything with a real trade-off. Don't add a default row, enricher,
+  or MCP surface by inventing a policy in the PR.
 - Test text-matching heuristics against real (or realistic synthetic) data
   before trusting them — a regex that looks plausible is not the same as
   one that's been checked against actual crawl output.

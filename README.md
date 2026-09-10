@@ -101,6 +101,7 @@ seo_geo_engine/            — the installable package
   scaffold/                    — `seo-geo-init-profile` — scaffold a new profile
 tests/                        — the engine's own test suite (fixtures + traceability)
 examples/sample-profile/       — synthetic worked example, not a real dependent
+docs/                         — phased plan + design docs (engine evolution, not a site audit)
 ```
 
 ## Status
@@ -125,13 +126,21 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       (85 fast + 2 slow Python, 16 JS) as of 2026-09-11.
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
-      above to work today.
+      above to work today. Design: [`docs/design/mcp.md`](docs/design/mcp.md).
 - [ ] Migrate `auto-ps-seo-audit` into a real profile depending on this
       engine (drop its own copy of `framework.py`/`standard_loader.py`/
       `report.py`/etc., keep only `site.yaml` + its business-specific
       `checks_ext.py`/`handlers.py`/`standard/extensions.md`/
-      `remediation-plan.md`/`playbooks/`).
+      `remediation-plan.md`/`playbooks/`). Design:
+      [`docs/design/profile-migration.md`](docs/design/profile-migration.md).
 - [ ] Same migration for `sevasek-com-seo-audit`.
 - [ ] An engine versioning/compatibility policy for those two migrations
       (semver, how a breaking rule-schema change reaches a profile pinned
-      to an older tag) — not decided yet.
+      to an older tag) — proposed in
+      [`docs/design/versioning.md`](docs/design/versioning.md); not
+      implemented until Phase 3.
+
+The phased path from this checklist to the loop above (engine-owned
+remediations, enrichment, closing the agent loop) is
+[`docs/PLAN.md`](docs/PLAN.md). Design docs for the pieces that need a
+decision before code: [`docs/`](docs/).

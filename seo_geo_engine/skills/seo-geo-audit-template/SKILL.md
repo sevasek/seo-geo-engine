@@ -49,8 +49,11 @@ python3 -m seo_geo_engine.crawl.run --profile site.yaml --local --out audits/dat
 ```
 
 Optional enrichment (PageSpeed Insights, Search Console) is a separate,
-profile-invoked step — see the engine's own docs for the enrichment script
-contracts, if this profile uses them.
+profile-invoked step — see `docs/design/enrichment.md` in the engine
+repo for the contract (post-crawl merge into the same site-dict; not
+implemented until that design's phase). Without it, PERF-002, PERF-003,
+and CRAWL-008 stay runtime-blocked. The rest of the loop does not wait
+on enrichment.
 
 ## 3. Regenerate the report + remediation queue
 
