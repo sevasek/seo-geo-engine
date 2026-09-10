@@ -5,15 +5,41 @@ standard, a check registry, a remediation-tracking layer, and a plain
 static-file report/dashboard generator — all driven by a per-site
 **profile** instead of being forked per site.
 
-This engine generalizes a pattern proven across two real, site-specific
-audit repos (one per business): a testable `standard.md` of weighted rules,
-one `@check(id)` function per rule, a bidirectionally-enforced test suite
-(no rule without a check, no check without a rule), a remediation-tracking
-layer mapping every non-passing rule to a tracked fix, and a deterministic
-report/HTML dashboard generator. Everything specific to one business — base
-URL, entity/topical clusters, contact-info patterns, extra standard rows —
-lives in a **profile** (a `site.yaml` + a small Python module), not in the
-engine.
+## The end state this is building toward
+
+The goal isn't a nicer audit report — it's a tool you point at *any number*
+of your own website repos, each as a thin profile, and have an agent take
+each one from wherever it starts to a genuinely strong, verified SEO/GEO
+score, without you re-explaining the standard or forking a copy of the
+engine per site.
+
+The loop, once a profile exists for a site: **crawl** (live URL, or the
+site's own repo booted locally and crawled before it's even deployed) →
+**score** against the effective standard (engine defaults + that profile's
+own rules) → **work the ranked remediation queue** — an agent drafts what's
+mechanically draftable from crawl data, works down manual playbooks for
+what needs editorial or access-gated judgment, and marks each item's status
+as it goes → **re-crawl and confirm the verdict actually flipped**, not
+just that a fix was applied. Repeat until the score reflects reality, then
+repeat again next quarter as the standard itself evolves. A profile is
+cheap enough to add that a new client site is a `site.yaml` and maybe a
+handful of rows, not a new repo to maintain in lockstep with the last one.
+
+This build is the engine and one worked example (`examples/sample-profile/`,
+entirely synthetic). The two real site-specific repos this generalizes —
+`auto-ps-seo-audit` and `sevasek-com-seo-audit` — still run their own
+forked copy of the pattern and haven't been migrated onto this engine yet;
+see "Status" below for exactly what that migration involves.
+
+Underneath the loop above, the engine generalizes a pattern already proven
+across those two real, site-specific audit repos: a testable `standard.md`
+of weighted rules, one `@check(id)` function per rule, a
+bidirectionally-enforced test suite (no rule without a check, no check
+without a rule), a remediation-tracking layer mapping every non-passing
+rule to a tracked fix, and a deterministic report/HTML dashboard generator.
+Everything specific to one business — base URL, entity/topical clusters,
+contact-info patterns, extra standard rows — lives in a **profile** (a
+`site.yaml` + a small Python module), not in the engine.
 
 ## Quickstart
 
@@ -79,4 +105,33 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
 
 ## Status
 
-Built in phases — see the project's own issue/PR history for what's live.
+- [x] Core: `@check` registry, multi-file standard merge (engine defaults +
+      profile extensions, override-by-ID semantics), weighted
+      partial-credit scoring, profile-aware report generation, a plain
+      deterministic static HTML dashboard.
+- [x] Remediation: `@remediate`/`manual` registry, points-lost-ranked
+      queue, `update_status()` for agent-driven queue work instead of
+      hand-editing `remediation-plan.md`.
+- [x] Fixture-based test harness: 32 built-in checks each with a
+      known-good/known-bad JSON fixture + a completeness gate (Layer 1),
+      plus a real deliberately-broken static site crawled end-to-end by
+      the real packaged crawler and a real headless browser (Layer 2).
+- [x] Local-serve-and-crawl: boot a profile's own dev/build command and
+      crawl `localhost` through the identical pipeline a live-URL audit
+      uses — verified same output shape, confirmed port teardown.
+- [x] Skill template + `seo-geo-init-profile` scaffold command — a
+      brand-new profile passes its own generated test with zero
+      hand-written logic beyond `site.yaml`. 103/103 tests green
+      (85 fast + 2 slow Python, 16 JS) as of 2026-09-11.
+- [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
+      Skill-only path has been used for real; not required for the loop
+      above to work today.
+- [ ] Migrate `auto-ps-seo-audit` into a real profile depending on this
+      engine (drop its own copy of `framework.py`/`standard_loader.py`/
+      `report.py`/etc., keep only `site.yaml` + its business-specific
+      `checks_ext.py`/`handlers.py`/`standard/extensions.md`/
+      `remediation-plan.md`/`playbooks/`).
+- [ ] Same migration for `sevasek-com-seo-audit`.
+- [ ] An engine versioning/compatibility policy for those two migrations
+      (semver, how a breaking rule-schema change reaches a profile pinned
+      to an older tag) — not decided yet.
