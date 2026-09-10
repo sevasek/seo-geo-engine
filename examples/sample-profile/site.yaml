@@ -1,0 +1,49 @@
+# Synthetic profile — proves the engine works end-to-end with zero real
+# business data. "Acme Example Co" is not a real company; every fact here
+# (address, phone, pages) is invented to match the shape a real profile's
+# site.yaml would have.
+
+site:
+  base_url: "https://www.acme-example.test"
+  org_name: "Acme Example Co"
+  org_name_fallback: "Acme Example Co"
+  locale: "en-AU"
+
+pages:
+  service_page_pattern: "/services/"
+  service_index_url: "https://www.acme-example.test/services/"
+  title_separator: "|"
+
+entity_clusters:
+  widgets:
+    - "https://www.acme-example.test/services/widget-installation/"
+    - "https://www.acme-example.test/services/widget-repair/"
+    - "https://www.acme-example.test/services/widget-consulting/"
+
+contact:
+  phone_pattern: "AU_MOBILE_LANDLINE"
+  address_patterns:
+    - name: "Head Office"
+      pattern: "123 Example Street, Sampleville NSW"
+
+crawl:
+  sitemap_url: "https://www.acme-example.test/sitemap.xml"
+  user_agent: "Mozilla/5.0 (compatible; AcmeExampleAuditBot/1.0)"
+
+local_dev:
+  # Stands in for a real website repo's own dev/build command (npm run dev,
+  # a Docker-composed WordPress, ...) — the engine only knows how to run an
+  # arbitrary command and poll a URL, so any profile can plug in its own.
+  start_command: "python3 -m http.server 8123 --directory local-site"
+  port: 8123
+  ready_url: "http://localhost:8123/index.html"
+  ready_timeout_s: 20
+  stop_command: null
+
+disabled_ids: []
+
+standard_extension_paths:
+  - standard/extensions.md
+
+checks_module: "checks_ext"
+handlers_module: "handlers"

@@ -1,0 +1,11 @@
+{
+  "name": "seo-geo-engine-crawl",
+  "private": true,
+  "description": "The engine's packaged crawler (crawl.js). Not published, not part of the Python package's import surface — shipped as package data so `pip install` gets both in lockstep.",
+  "scripts": {
+    "test": "node --test crawl.test.js"
+  },
+  "dependencies": {
+    "playwright": "1.62.1"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "verdict": "fail",
+  "fraction": 0.0,
+  "evidence_contains": [
+    "https://example.com/page/"
+  ]
+}

@@ -1,0 +1,380 @@
+<title>__TITLE__</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Quattrocento+Sans:wght@400;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --bg: #f1eee9;
+    --surface: #ffffff;
+    --surface-sunken: #e8e3da;
+    --ink: #1f1f1f;
+    --ink-soft: #55595f;
+    --ink-faint: #83878d;
+    --steel: #14529e;
+    --steel-soft: #dbe7f4;
+    --steel-line: #a9c3dd;
+    --accent: #1a2b6d;
+    --accent-soft: #dde1ec;
+    --good: #2f7a5c;
+    --good-soft: #dcece4;
+    --warning: #a56c1f;
+    --warning-soft: #f2e4cc;
+    --critical: #a5342a;
+    --critical-soft: #f4dcda;
+    --neutral-soft: #e8e3da;
+    --border: #ddd7cc;
+    --font-display: 'Montserrat', 'Helvetica', sans-serif;
+    --font-body: 'Quattrocento Sans', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10161d; --surface: #1b2430; --surface-sunken: #141b24;
+      --ink: #ececeb; --ink-soft: #b7bcc2; --ink-faint: #7d838a;
+      --steel: #5c96d6; --steel-soft: #1b2f45; --steel-line: #2c4a66;
+      --accent: #8a9ed3; --accent-soft: #232c42;
+      --good: #5cba95; --good-soft: #163227;
+      --warning: #d9a24b; --warning-soft: #33260f;
+      --critical: #e0776f; --critical-soft: #34191a;
+      --neutral-soft: #1b2430;
+      --border: #263140;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10161d; --surface: #1b2430; --surface-sunken: #141b24;
+    --ink: #ececeb; --ink-soft: #b7bcc2; --ink-faint: #7d838a;
+    --steel: #5c96d6; --steel-soft: #1b2f45; --steel-line: #2c4a66;
+    --accent: #8a9ed3; --accent-soft: #232c42;
+    --good: #5cba95; --good-soft: #163227;
+    --warning: #d9a24b; --warning-soft: #33260f;
+    --critical: #e0776f; --critical-soft: #34191a;
+    --neutral-soft: #1b2430;
+    --border: #263140;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px 96px; }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  header.band {
+    background: var(--steel);
+    color: #f2f6f7;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid var(--accent);
+  }
+  header.band::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 28px);
+    pointer-events: none;
+  }
+  :root[data-theme="dark"] header.band, :root:not([data-theme="light"]) header.band { background: #0a1626; }
+  header .wrap { position: relative; padding-top: 44px; padding-bottom: 32px; }
+  .eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: #cfe0e6; opacity: 0.85; margin-bottom: 10px; }
+  header h1 { font-size: clamp(2rem, 4.5vw, 2.7rem); font-weight: 600; letter-spacing: 0.01em; }
+  header .sub { margin-top: 10px; color: #cfe0e6; max-width: 62ch; font-size: 1.02rem; }
+  .meta-row { margin-top: 20px; display: flex; gap: 24px; flex-wrap: wrap; font-size: 0.88rem; color: #d7e6ea; }
+  .meta-row strong { color: #fff; font-family: var(--font-mono); }
+
+  /* ---------- score ---------- */
+  section.score-section .wrap { display: grid; grid-template-columns: 200px 1fr; gap: 40px; padding-top: 38px; align-items: center; }
+  @media (max-width: 700px) { section.score-section .wrap { grid-template-columns: 1fr; } }
+  .gauge {
+    width: 180px; height: 180px; border-radius: 50%; position: relative;
+    display: flex; align-items: center; justify-content: center; justify-self: center;
+  }
+  .gauge::before { content: ""; position: absolute; inset: 14px; border-radius: 50%; background: var(--bg); }
+  .gauge .readout { position: relative; text-align: center; }
+  .gauge .score-num { font-family: var(--font-mono); font-size: 2.1rem; font-weight: 600; color: var(--ink); line-height: 1; }
+  .gauge .score-den { font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink-faint); margin-top: 2px; }
+  .verdict h2 { font-size: 1.3rem; color: var(--ink); margin-bottom: 8px; }
+  .verdict p { color: var(--ink-soft); max-width: 66ch; font-size: 0.95rem; }
+  .stat-row { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .stat { display: flex; align-items: baseline; gap: 6px; background: var(--surface-sunken); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; }
+  .stat .n { font-family: var(--font-mono); font-size: 1.05rem; font-weight: 600; }
+  .stat .l { font-size: 0.74rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat.pass .n { color: var(--good); }
+  .stat.fail .n { color: var(--critical); }
+  .stat.blocked .n { color: var(--warning); }
+
+  /* ---------- top issues ---------- */
+  section.top-issues { margin-top: 48px; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; border-bottom: 2px solid var(--steel); padding-bottom: 8px; }
+  .section-head h2 { font-size: 1.35rem; color: var(--ink); }
+  .section-head .hint { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-faint); }
+
+  .issue-list { display: flex; flex-direction: column; gap: 8px; }
+  .issue {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    padding: 12px 16px; display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center;
+  }
+  .issue .rank {
+    font-family: var(--font-mono); font-weight: 600; font-size: 0.95rem; color: var(--accent);
+    background: var(--accent-soft); width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .issue .body .rule-line { font-size: 0.92rem; font-weight: 600; color: var(--ink); }
+  .issue .body .meta-line { margin-top: 4px; font-size: 0.8rem; color: var(--ink-soft); }
+  .issue .points { text-align: right; white-space: nowrap; }
+  .issue .points .pts { font-family: var(--font-mono); font-weight: 600; font-size: 0.95rem; color: var(--critical); }
+  .issue .points .w { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-faint); }
+
+  /* ---------- toolbar + full list ---------- */
+  .toolbar { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--border); padding: 14px 0; margin-top: 48px; margin-bottom: 8px; }
+  .toolbar .wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 0; padding-bottom: 0; }
+  .toolbar .label { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px; }
+  button.filter {
+    font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.02em;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink-soft);
+    cursor: pointer;
+  }
+  button.filter:hover { border-color: var(--steel-line); }
+  button.filter.active { background: var(--steel); color: #f2f6f7; border-color: var(--steel); }
+  :root[data-theme="dark"] button.filter.active, :root:not([data-theme="light"]) button.filter.active { background: var(--steel); color: #0a1626; }
+
+  section.category { margin-top: 40px; }
+  .cat-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; border-bottom: 2px solid var(--steel); padding-bottom: 8px; }
+  .cat-head h2 { font-size: 1.35rem; color: var(--ink); }
+  .cat-head .count { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-faint); }
+
+  .rule-list { display: flex; flex-direction: column; gap: 10px; }
+  .rule { background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--border); border-radius: 6px; padding: 16px 18px; }
+  .rule.pass { border-left-color: var(--good); }
+  .rule.fail { border-left-color: var(--critical); }
+  .rule.blocked { border-left-color: var(--warning); }
+
+  .rule-top { display: flex; align-items: flex-start; gap: 12px; }
+  .badge { flex: none; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 9px; border-radius: 4px; margin-top: 2px; }
+  .badge.pass { background: var(--good-soft); color: var(--good); }
+  .badge.fail { background: var(--critical-soft); color: var(--critical); }
+  .badge.blocked { background: var(--warning-soft); color: var(--warning); }
+
+  .rule-id-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .rule-id { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-faint); margin-bottom: 3px; }
+  .rule-points { font-family: var(--font-mono); font-size: 0.76rem; color: var(--ink-faint); white-space: nowrap; }
+  .rule-text { font-size: 0.98rem; font-weight: 600; color: var(--ink); }
+  .rule-detail { margin-top: 8px; font-size: 0.9rem; color: var(--ink-soft); }
+  .rule-source { margin-top: 8px; font-size: 0.78rem; color: var(--ink-faint); font-style: italic; }
+  .rule-source a { color: var(--steel); font-style: normal; }
+  .rule code, .rule-text code, .rule-detail code {
+    font-family: var(--font-mono); font-style: normal; font-size: 0.92em;
+    background: var(--neutral-soft); padding: 1px 5px; border-radius: 3px;
+  }
+
+  details.evidence { margin-top: 10px; }
+  details.evidence summary {
+    cursor: pointer; font-family: var(--font-mono); font-size: 0.78rem; color: var(--steel);
+    list-style: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  details.evidence summary::-webkit-details-marker { display: none; }
+  details.evidence summary::before { content: "▸"; display: inline-block; transition: transform 0.15s ease; }
+  details.evidence[open] summary::before { transform: rotate(90deg); }
+  .evidence-list {
+    margin: 10px 0 0; padding: 10px 14px; background: var(--surface-sunken); border-radius: 5px;
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-soft);
+    max-height: 260px; overflow-y: auto;
+  }
+  .evidence-list div { padding: 3px 0; border-bottom: 1px solid var(--border); word-break: break-word; }
+  .evidence-list div:last-child { border-bottom: none; }
+
+  .empty-state { padding: 40px 0; text-align: center; color: var(--ink-faint); font-family: var(--font-mono); font-size: 0.85rem; display: none; }
+
+  footer.notes { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border); color: var(--ink-faint); font-size: 0.84rem; }
+  footer.notes p { max-width: 74ch; }
+  footer.notes code { font-family: var(--font-mono); background: var(--surface-sunken); padding: 1px 5px; border-radius: 3px; }
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="eyebrow">__EYEBROW__</div>
+    <h1>__TITLE__</h1>
+    <p class="sub">One merged report: a weighted score, the top issues to fix first, and the full standard behind both — generated in one deterministic pass from the effective standard (engine defaults + this profile's extensions), nothing hand-edited, nothing AI-authored.</p>
+    <div class="meta-row" id="meta-row"></div>
+  </div>
+</header>
+
+<section class="score-section">
+  <div class="wrap">
+    <div class="gauge" id="gauge">
+      <div class="readout">
+        <div class="score-num" id="score-num">–</div>
+        <div class="score-den" id="score-den">/ –</div>
+      </div>
+    </div>
+    <div class="verdict">
+      <h2 id="score-headline"></h2>
+      <p id="score-sub"></p>
+      <div class="stat-row" id="stat-row"></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <section class="top-issues">
+    <div class="section-head">
+      <h2>Top issues right now</h2>
+      <span class="hint">ranked by points lost — fixing #1 moves the score the most</span>
+    </div>
+    <div class="issue-list" id="issue-list"></div>
+  </section>
+</div>
+
+<div class="toolbar">
+  <div class="wrap">
+    <span class="label">Show</span>
+    <button class="filter active" data-filter="all">All</button>
+    <button class="filter" data-filter="fail">Fail</button>
+    <button class="filter" data-filter="blocked">Blocked</button>
+    <button class="filter" data-filter="pass">Pass</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="categories"></div>
+  <div class="empty-state" id="empty-state">Nothing matches this filter.</div>
+
+  <footer class="notes">
+    <p><strong>Reading this:</strong> the score is weighted and partial-credit — blocked rules count their full weight against the possible total but earn zero until they can be assessed. <em>Pass / fail / blocked</em> in the full list below is the actual verdict per rule; <em>open</em> vs <em>blocked</em> in the standard itself is about whether the engine can assess the rule at all today. This is a plain static file, regenerated deterministically from a standard-report JSON — never hand-edited, never AI-authored, never published through a hosted "Artifact" system.</p>
+  </footer>
+</div>
+
+<script>
+  const items = __ITEMS_JSON__;
+  const score = __SCORE_JSON__;
+  const topIssues = __TOP_ISSUES_JSON__;
+
+  const verdictLabel = { pass: "Pass", fail: "Fail", blocked: "Blocked" };
+  const toneVar = { pass: "var(--good)", fail: "var(--critical)", blocked: "var(--warning)" };
+
+  function escHtml(s) {
+    return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function mdInline(s) {
+    return escHtml(s)
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/`([^`]+)`/g, "<code>$1</code>");
+  }
+
+  document.getElementById("meta-row").innerHTML =
+    `<span>Standard rules &nbsp;<strong>${items.length}</strong></span>` +
+    `<span>Method &nbsp;<strong>weighted, partial-credit</strong></span>`;
+
+  document.getElementById("gauge").style.background =
+    `conic-gradient(var(--accent) 0% ${score.percent}%, var(--surface-sunken) ${score.percent}% 100%)`;
+  document.getElementById("score-num").textContent = score.earned;
+  document.getElementById("score-den").textContent = `/ ${score.possible} (${score.percent}%)`;
+  document.getElementById("score-headline").textContent = `${score.percent}% of what's checkable is verified working`;
+  document.getElementById("score-sub").textContent =
+    "Blocked rules count against the total but can't earn points until they're assessable — unblocking one can move the score before any fix lands.";
+
+  const counts = { pass: 0, fail: 0, blocked: 0 };
+  items.forEach(i => counts[i.verdict]++);
+  const statRow = document.getElementById("stat-row");
+  [["pass", "Pass"], ["fail", "Fail"], ["blocked", "Blocked"]].forEach(([key, label]) => {
+    const el = document.createElement("div");
+    el.className = "stat " + key;
+    el.innerHTML = `<span class="n">${counts[key]}</span><span class="l">${label}</span>`;
+    statRow.appendChild(el);
+  });
+
+  const issueList = document.getElementById("issue-list");
+  topIssues.forEach((issue, i) => {
+    const el = document.createElement("div");
+    el.className = "issue";
+    el.innerHTML = `
+      <div class="rank num">${i + 1}</div>
+      <div class="body">
+        <div class="rule-line">${mdInline(issue.id)} — ${mdInline(issue.rule)}</div>
+        <div class="meta-line">${escHtml(issue.category)} · <span style="color:${toneVar[issue.verdict]}">${verdictLabel[issue.verdict]}</span> · ${mdInline(issue.detail)}</div>
+      </div>
+      <div class="points">
+        <div class="pts">-${issue.points_lost}</div>
+        <div class="w">of ${issue.weight} pts</div>
+      </div>
+    `;
+    issueList.appendChild(el);
+  });
+
+  const byCategory = [];
+  items.forEach(item => {
+    let group = byCategory.find(g => g.category === item.category);
+    if (!group) { group = { category: item.category, items: [] }; byCategory.push(group); }
+    group.items.push(item);
+  });
+
+  const categoriesEl = document.getElementById("categories");
+  byCategory.forEach(group => {
+    const section = document.createElement("section");
+    section.className = "category";
+    const head = document.createElement("div");
+    head.className = "cat-head";
+    head.innerHTML = `<h2>${escHtml(group.category)}</h2><span class="count">${group.items.length} rule${group.items.length === 1 ? "" : "s"}</span>`;
+    section.appendChild(head);
+
+    const list = document.createElement("div");
+    list.className = "rule-list";
+
+    group.items.forEach(item => {
+      const rule = document.createElement("div");
+      rule.className = "rule " + item.verdict;
+      rule.dataset.verdict = item.verdict;
+
+      let evidenceHtml = "";
+      if (item.evidence && item.evidence.length) {
+        const rows = item.evidence.map(e => `<div>${escHtml(e)}</div>`).join("");
+        evidenceHtml = `
+          <details class="evidence">
+            <summary>${item.evidence.length} evidence item${item.evidence.length === 1 ? "" : "s"}</summary>
+            <div class="evidence-list">${rows}</div>
+          </details>`;
+      }
+
+      rule.innerHTML = `
+        <div class="rule-top">
+          <span class="badge ${item.verdict}">${verdictLabel[item.verdict]}</span>
+          <div style="flex:1;">
+            <div class="rule-id-row">
+              <div class="rule-id">${escHtml(item.id)}</div>
+              <div class="rule-points">${item.points_earned}/${item.weight} pts</div>
+            </div>
+            <div class="rule-text">${mdInline(item.rule)}</div>
+            <div class="rule-detail">${mdInline(item.detail)}</div>
+            <div class="rule-source">Source: ${mdInline(item.source || "")}</div>
+            ${evidenceHtml}
+          </div>
+        </div>
+      `;
+      list.appendChild(rule);
+    });
+
+    section.appendChild(list);
+    categoriesEl.appendChild(section);
+  });
+
+  const buttons = document.querySelectorAll("button.filter");
+  const emptyState = document.getElementById("empty-state");
+  function applyFilter(filter) {
+    let anyVisible = false;
+    document.querySelectorAll(".rule").forEach(el => {
+      const show = filter === "all" || el.dataset.verdict === filter;
+      el.style.display = show ? "block" : "none";
+      if (show) anyVisible = true;
+    });
+    document.querySelectorAll("section.category").forEach(sec => {
+      const hasVisible = Array.from(sec.querySelectorAll(".rule")).some(r => r.style.display !== "none");
+      sec.style.display = hasVisible ? "block" : "none";
+    });
+    emptyState.style.display = anyVisible ? "none" : "block";
+  }
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      applyFilter(btn.dataset.filter);
+    });
+  });
+</script>

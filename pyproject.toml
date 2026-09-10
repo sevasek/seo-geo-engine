@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seo-geo-engine"
+version = "0.1.0"
+description = "A website-agnostic SEO/GEO audit-and-remediation engine: a weighted rule standard, a check registry, a remediation-tracking layer, and a report/dashboard generator, all driven by a per-site profile instead of being forked per site."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=9"]
+mcp = ["mcp>=1.0"]
+
+[project.scripts]
+seo-geo-report = "seo_geo_engine.report:main"
+seo-geo-remediate = "seo_geo_engine.remediation.plan:main"
+seo-geo-crawl = "seo_geo_engine.crawl.run:main"
+seo-geo-init-profile = "seo_geo_engine.scaffold.init_profile:main"
+
+[tool.setuptools.packages.find]
+include = ["seo_geo_engine*"]
+
+[tool.setuptools.package-data]
+seo_geo_engine = [
+    "crawler/*.js",
+    "crawler/package.json",
+    "report_template.html",
+    "standard/default/*.md",
+    "skills/**/*.md",
+    "routines/*.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m \"not slow\""
+markers = [
+    "slow: real-HTML/real-crawler integration tests, excluded by default (-m \"not slow\"); run explicitly with `pytest -m slow`",
+]

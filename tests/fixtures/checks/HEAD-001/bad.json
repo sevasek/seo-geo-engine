@@ -1,0 +1,43 @@
+{
+  "pages": [
+    {
+      "url": "https://example.com/page/",
+      "title": "A Good Example Page Title Here",
+      "titleLen": 45,
+      "metaDesc": "A perfectly reasonable meta description that sits within the ideal length range for SEO purposes today.",
+      "metaDescLen": 140,
+      "canonical": "https://example.com/page/",
+      "dupOgTags": [],
+      "ogDescription": "A fine, non-empty description.",
+      "h1Count": 2,
+      "h1s": [
+        "A Good Heading"
+      ],
+      "h2Count": 2,
+      "headingSequence": [
+        "h1",
+        "h2",
+        "h2"
+      ],
+      "jsonLdTypes": [
+        "Service"
+      ],
+      "wordCount": 600,
+      "pTagWordCount": 450,
+      "dateModified": "2026-01-01",
+      "imageCount": 5,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 50000,
+      "pageSpeed": {
+        "lcpMs": 1500,
+        "cls": 0.02,
+        "hasFieldData": false
+      },
+      "internalHrefs": [],
+      "contentInternalHrefs": [],
+      "noJsWordCount": 500
+    }
+  ]
+}
