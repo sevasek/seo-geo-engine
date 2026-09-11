@@ -132,6 +132,31 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       `checks_ext.py`/`handlers.py`/`standard/extensions.md`/
       `remediation-plan.md`/`playbooks/`).
 - [ ] Same migration for `sevasek-com-seo-audit`.
-- [ ] An engine versioning/compatibility policy for those two migrations
-      (semver, how a breaking rule-schema change reaches a profile pinned
-      to an older tag) — not decided yet.
+- [x] Engine versioning/compatibility policy — 0.x is treated like 1.x
+      for compatibility; profiles pin `seo-geo-engine>=0.1,<0.2`; the
+      public API is crawl JSON + check ID semantics + `@check`/
+      `@remediate` signatures. See
+      [docs/design/versioning.md](docs/design/versioning.md) and
+      [CHANGELOG.md](CHANGELOG.md). Not on PyPI; `1.0.0` waits on a
+      real profile migration.
+
+## Versioning
+
+Package version is **0.1.0**. During 0.x we treat compatibility like
+1.x: do not casually break profiles. Profiles pin
+
+```
+seo-geo-engine>=0.1,<0.2
+```
+
+The public API is the crawl JSON, check ID semantics, and the
+`@check` / `@remediate` function signatures — not only the Python
+modules. Every release's `CHANGELOG.md` entry lists standard IDs
+added, removed, or reweighted; crawl-contract field changes; and
+profile migration notes. `examples/sample-profile/` is the 0.1.x
+compatibility canary (`pytest` in this repo runs it).
+
+This package is not published to PyPI yet (editable install + git tag
+is enough until a real profile wants a non-editable pin). `1.0.0` is a
+Phase 3 exit after a real audit has migrated, not this release. Full
+policy: [docs/design/versioning.md](docs/design/versioning.md).
