@@ -48,9 +48,23 @@ A website repo, before it's deployed (needs `local_dev` configured in
 python3 -m seo_geo_engine.crawl.run --profile site.yaml --local --out audits/data/site-crawl-<date>.json
 ```
 
-Optional enrichment (PageSpeed Insights, Search Console) is a separate,
-profile-invoked step — see the engine's own docs for the enrichment script
-contracts, if this profile uses them.
+Optional enrichment is a separate, profile-invoked step after crawl
+(PageSpeed Insights, Search Console). Either flag may be omitted —
+without it, PERF-002, PERF-003, and CRAWL-008 stay runtime-blocked:
+
+```bash
+seo-geo-enrich audits/data/site-crawl-<date>.json \
+    --profile site.yaml \
+    --pagespeed \
+    --gsc
+```
+
+`--pagespeed` needs `PAGESPEED_API_KEY` (or the env var named by
+`profile.enrichment.pagespeed_api_key_env`) and is refused for
+localhost / `.test` / private IPs. `--gsc` needs
+`pip install seo-geo-engine[enrich]` plus ADC or `GSC_CREDENTIALS_JSON`,
+and `profile.enrichment.gsc_property`. Default `--out` overwrites the
+crawl JSON in place. See `docs/design/enrichment.md`.
 
 ## 3. Regenerate the report + remediation queue
 

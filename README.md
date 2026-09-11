@@ -123,6 +123,11 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       brand-new profile passes its own generated test with zero
       hand-written logic beyond `site.yaml`. 103/103 tests green
       (85 fast + 2 slow Python, 16 JS) as of 2026-09-11.
+- [x] Enrichment: `seo-geo-enrich` post-crawl merge of PageSpeed Insights
+      (mobile lab LCP/CLS) and Search Console sitemap status. GSC client
+      libs are `pip install seo-geo-engine[enrich]`; credentials stay in
+      the environment. See
+      [docs/design/enrichment.md](docs/design/enrichment.md).
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
       above to work today.

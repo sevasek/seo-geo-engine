@@ -1,0 +1,46 @@
+{
+  "sitemapUrls": [
+    "https://example.com/"
+  ],
+  "robotsTxt": "User-agent: *\nAllow: /\n",
+  "discoveredNonSitemapPages": [],
+  "linkResolutions": [
+    {
+      "url": "https://example.com/",
+      "status": 200,
+      "redirected": false
+    }
+  ],
+  "pages": [
+    {
+      "url": "https://example.com/",
+      "title": "Example",
+      "titleLen": 7,
+      "metaDesc": "Example page.",
+      "metaDescLen": 13,
+      "canonical": "https://example.com/",
+      "dupOgTags": [],
+      "ogDescription": "Example",
+      "h1Count": 1,
+      "h1s": [
+        "Example"
+      ],
+      "h2Count": 0,
+      "headingSequence": [
+        "h1"
+      ],
+      "jsonLdTypes": [],
+      "wordCount": 200,
+      "pTagWordCount": 150,
+      "dateModified": "2026-09-01",
+      "imageCount": 0,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 12000,
+      "internalHrefs": [],
+      "contentInternalHrefs": [],
+      "noJsWordCount": 180
+    }
+  ]
+}

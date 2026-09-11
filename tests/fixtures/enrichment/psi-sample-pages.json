@@ -1,0 +1,268 @@
+{
+  "https://www.acme-example.test/": {
+    "id": "https://www.acme-example.test/",
+    "captchaResult": "CAPTCHA_NOT_NEEDED",
+    "kind": "pagespeedonline#result",
+    "lighthouseResult": {
+      "requestedUrl": "https://www.acme-example.test/",
+      "finalUrl": "https://www.acme-example.test/",
+      "configSettings": {
+        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile"
+      },
+      "audits": {
+        "largest-contentful-paint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "numericValue": 1800,
+          "numericUnit": "millisecond",
+          "displayValue": "1.8 s"
+        },
+        "cumulative-layout-shift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "numericValue": 0.03,
+          "numericUnit": "unitless",
+          "displayValue": "0.03"
+        },
+        "experimental-interaction-to-next-paint": {
+          "id": "experimental-interaction-to-next-paint",
+          "title": "Interaction to Next Paint",
+          "numericValue": 188,
+          "numericUnit": "millisecond"
+        }
+      }
+    },
+    "loadingExperience": {
+      "initial_url": "https://www.acme-example.test/"
+    }
+  },
+  "https://www.acme-example.test/services/": {
+    "id": "https://www.acme-example.test/services/",
+    "captchaResult": "CAPTCHA_NOT_NEEDED",
+    "kind": "pagespeedonline#result",
+    "lighthouseResult": {
+      "requestedUrl": "https://www.acme-example.test/services/",
+      "finalUrl": "https://www.acme-example.test/services/",
+      "configSettings": {
+        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile"
+      },
+      "audits": {
+        "largest-contentful-paint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "numericValue": 2100,
+          "numericUnit": "millisecond",
+          "displayValue": "2.1 s"
+        },
+        "cumulative-layout-shift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "numericValue": 0.04,
+          "numericUnit": "unitless",
+          "displayValue": "0.04"
+        },
+        "experimental-interaction-to-next-paint": {
+          "id": "experimental-interaction-to-next-paint",
+          "title": "Interaction to Next Paint",
+          "numericValue": 188,
+          "numericUnit": "millisecond"
+        }
+      }
+    },
+    "loadingExperience": {
+      "initial_url": "https://www.acme-example.test/services/"
+    }
+  },
+  "https://www.acme-example.test/services/widget-installation/": {
+    "id": "https://www.acme-example.test/services/widget-installation/",
+    "captchaResult": "CAPTCHA_NOT_NEEDED",
+    "kind": "pagespeedonline#result",
+    "lighthouseResult": {
+      "requestedUrl": "https://www.acme-example.test/services/widget-installation/",
+      "finalUrl": "https://www.acme-example.test/services/widget-installation/",
+      "configSettings": {
+        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile"
+      },
+      "audits": {
+        "largest-contentful-paint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "numericValue": 2000,
+          "numericUnit": "millisecond",
+          "displayValue": "2.0 s"
+        },
+        "cumulative-layout-shift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "numericValue": 0.05,
+          "numericUnit": "unitless",
+          "displayValue": "0.05"
+        },
+        "experimental-interaction-to-next-paint": {
+          "id": "experimental-interaction-to-next-paint",
+          "title": "Interaction to Next Paint",
+          "numericValue": 188,
+          "numericUnit": "millisecond"
+        }
+      }
+    },
+    "loadingExperience": {
+      "initial_url": "https://www.acme-example.test/services/widget-installation/"
+    }
+  },
+  "https://www.acme-example.test/services/widget-repair/": {
+    "id": "https://www.acme-example.test/services/widget-repair/",
+    "captchaResult": "CAPTCHA_NOT_NEEDED",
+    "kind": "pagespeedonline#result",
+    "lighthouseResult": {
+      "requestedUrl": "https://www.acme-example.test/services/widget-repair/",
+      "finalUrl": "https://www.acme-example.test/services/widget-repair/",
+      "configSettings": {
+        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile"
+      },
+      "audits": {
+        "largest-contentful-paint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "numericValue": 3200,
+          "numericUnit": "millisecond",
+          "displayValue": "3.2 s"
+        },
+        "cumulative-layout-shift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "numericValue": 0.18,
+          "numericUnit": "unitless",
+          "displayValue": "0.18"
+        },
+        "experimental-interaction-to-next-paint": {
+          "id": "experimental-interaction-to-next-paint",
+          "title": "Interaction to Next Paint",
+          "numericValue": 188,
+          "numericUnit": "millisecond"
+        }
+      }
+    },
+    "loadingExperience": {
+      "initial_url": "https://www.acme-example.test/services/widget-repair/"
+    }
+  },
+  "https://www.acme-example.test/services/widget-consulting/": {
+    "id": "https://www.acme-example.test/services/widget-consulting/",
+    "captchaResult": "CAPTCHA_NOT_NEEDED",
+    "kind": "pagespeedonline#result",
+    "lighthouseResult": {
+      "requestedUrl": "https://www.acme-example.test/services/widget-consulting/",
+      "finalUrl": "https://www.acme-example.test/services/widget-consulting/",
+      "configSettings": {
+        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile"
+      },
+      "audits": {
+        "largest-contentful-paint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "numericValue": 2200,
+          "numericUnit": "millisecond",
+          "displayValue": "2.2 s"
+        },
+        "cumulative-layout-shift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "numericValue": 0.06,
+          "numericUnit": "unitless",
+          "displayValue": "0.06"
+        },
+        "experimental-interaction-to-next-paint": {
+          "id": "experimental-interaction-to-next-paint",
+          "title": "Interaction to Next Paint",
+          "numericValue": 188,
+          "numericUnit": "millisecond"
+        }
+      }
+    },
+    "loadingExperience": {
+      "initial_url": "https://www.acme-example.test/services/widget-consulting/"
+    }
+  },
+  "https://www.acme-example.test/about/": {
+    "id": "https://www.acme-example.test/about/",
+    "captchaResult": "CAPTCHA_NOT_NEEDED",
+    "kind": "pagespeedonline#result",
+    "lighthouseResult": {
+      "requestedUrl": "https://www.acme-example.test/about/",
+      "finalUrl": "https://www.acme-example.test/about/",
+      "configSettings": {
+        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile"
+      },
+      "audits": {
+        "largest-contentful-paint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "numericValue": 1900,
+          "numericUnit": "millisecond",
+          "displayValue": "1.9 s"
+        },
+        "cumulative-layout-shift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "numericValue": 0.02,
+          "numericUnit": "unitless",
+          "displayValue": "0.02"
+        },
+        "experimental-interaction-to-next-paint": {
+          "id": "experimental-interaction-to-next-paint",
+          "title": "Interaction to Next Paint",
+          "numericValue": 188,
+          "numericUnit": "millisecond"
+        }
+      }
+    },
+    "loadingExperience": {
+      "initial_url": "https://www.acme-example.test/about/"
+    }
+  },
+  "https://www.acme-example.test/contact/": {
+    "id": "https://www.acme-example.test/contact/",
+    "captchaResult": "CAPTCHA_NOT_NEEDED",
+    "kind": "pagespeedonline#result",
+    "lighthouseResult": {
+      "requestedUrl": "https://www.acme-example.test/contact/",
+      "finalUrl": "https://www.acme-example.test/contact/",
+      "configSettings": {
+        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile"
+      },
+      "audits": {
+        "largest-contentful-paint": {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "numericValue": 2300,
+          "numericUnit": "millisecond",
+          "displayValue": "2.3 s"
+        },
+        "cumulative-layout-shift": {
+          "id": "cumulative-layout-shift",
+          "title": "Cumulative Layout Shift",
+          "numericValue": 0.07,
+          "numericUnit": "unitless",
+          "displayValue": "0.07"
+        },
+        "experimental-interaction-to-next-paint": {
+          "id": "experimental-interaction-to-next-paint",
+          "title": "Interaction to Next Paint",
+          "numericValue": 188,
+          "numericUnit": "millisecond"
+        }
+      }
+    },
+    "loadingExperience": {
+      "initial_url": "https://www.acme-example.test/contact/"
+    }
+  }
+}

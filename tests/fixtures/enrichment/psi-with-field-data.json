@@ -1,0 +1,45 @@
+{
+  "id": "https://example.com/",
+  "captchaResult": "CAPTCHA_NOT_NEEDED",
+  "kind": "pagespeedonline#result",
+  "lighthouseResult": {
+    "requestedUrl": "https://example.com/",
+    "finalUrl": "https://example.com/",
+    "configSettings": {
+      "emulatedFormFactor": "mobile",
+      "formFactor": "mobile"
+    },
+    "audits": {
+      "largest-contentful-paint": {
+        "id": "largest-contentful-paint",
+        "title": "Largest Contentful Paint",
+        "numericValue": 1500,
+        "numericUnit": "millisecond",
+        "displayValue": "1.5 s"
+      },
+      "cumulative-layout-shift": {
+        "id": "cumulative-layout-shift",
+        "title": "Cumulative Layout Shift",
+        "numericValue": 0.02,
+        "numericUnit": "unitless",
+        "displayValue": "0.02"
+      },
+      "experimental-interaction-to-next-paint": {
+        "id": "experimental-interaction-to-next-paint",
+        "title": "Interaction to Next Paint",
+        "numericValue": 188,
+        "numericUnit": "millisecond"
+      }
+    }
+  },
+  "loadingExperience": {
+    "initial_url": "https://example.com/",
+    "metrics": {
+      "LARGEST_CONTENTFUL_PAINT_MS": {
+        "percentile": 1400,
+        "category": "FAST"
+      }
+    },
+    "overall_category": "FAST"
+  }
+}
