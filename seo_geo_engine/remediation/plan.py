@@ -7,18 +7,24 @@ dependencies from a remediation-plan.md, and split into "ready to work now"
 vs. "blocked on an access/decision gap" so effort doesn't get spent
 scripting a fix for something nothing can unblock yet.
 
+With --id, runs that ID's script handler and writes the artifact instead
+of rendering the queue. Does not call update_status — the agent marks
+in-progress / applied after it has actually pasted or committed the draft.
+
 Usage:
     python3 -m seo_geo_engine.remediation.plan <site-crawl.json> --profile site.yaml
+    python3 -m seo_geo_engine.remediation.plan <site-crawl.json> --profile site.yaml --id SCHEMA-001
 """
 import argparse
 import json
 import sys
 from pathlib import Path
 
+import seo_geo_engine.remediation  # noqa: F401
 from seo_geo_engine.checks.standard_loader import StandardItem, load_standard
 from seo_geo_engine.paths import default_standard_paths
 from seo_geo_engine.profile import SiteProfile, effective_standard, import_profile_code, load_profile
-from seo_geo_engine.remediation.remediation_framework import REGISTRY
+from seo_geo_engine.remediation.remediation_framework import REGISTRY, RemediationResult
 from seo_geo_engine.remediation.remediation_loader import load_remediation_plan_by_id
 from seo_geo_engine.report import _points_earned, run_report
 
@@ -96,6 +102,30 @@ def render_markdown(queue: list[dict], date: str) -> str:
     return "\n".join(lines) + "\n"
 
 
+def run_script_handler(site: dict, item_id: str, profile: SiteProfile | None = None) -> RemediationResult:
+    """Invoke a kind=script handler. Raises ValueError if the ID isn't a
+    registered script remediation."""
+    if profile is not None:
+        site = {**site, "profile": profile.to_dict()}
+    registered = REGISTRY.get(item_id)
+    if registered is None:
+        raise ValueError(f"No remediation registered for {item_id}")
+    if registered.kind != "script":
+        raise ValueError(
+            f"{item_id} is kind={registered.kind!r}, not script. "
+            f"Follow {registered.playbook or 'its playbook'} instead of --id."
+        )
+    return registered.fn(site)
+
+
+def write_artifact(result: RemediationResult, out_dir: Path, date: str) -> Path:
+    artifact_dir = Path(out_dir) / "artifacts" / date
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    out_path = artifact_dir / f"{result.id}.txt"
+    out_path.write_text(result.artifact, encoding="utf-8")
+    return out_path
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("site_path")
@@ -104,12 +134,19 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--plan", help="path to remediation-plan.md (defaults to <profile dir>/remediation-plan.md)")
     parser.add_argument("--standard", action="append", help="extra standard .md path(s); only used without --profile")
     parser.add_argument("--out-dir", default="audits")
+    parser.add_argument(
+        "--id",
+        dest="item_id",
+        help="run this ID's script handler and write audits/artifacts/<date>/<ID>.txt",
+    )
     args = parser.parse_args(argv if argv is not None else sys.argv[1:])
 
     site_path = Path(args.site_path)
     site = json.loads(site_path.read_text(encoding="utf-8"))
 
     profile = None
+    items = None
+    plan_path = None
     if args.profile:
         profile = load_profile(args.profile)
         import_profile_code(profile)
@@ -118,9 +155,20 @@ def main(argv: list[str] | None = None) -> None:
     else:
         paths = [Path(p) for p in args.standard] if args.standard else default_standard_paths()
         items = load_standard(paths)
-        if not args.plan:
+        if args.item_id is None and not args.plan:
             parser.error("--plan is required when --profile is not given")
-        plan_path = Path(args.plan)
+        if args.plan:
+            plan_path = Path(args.plan)
+
+    if args.item_id:
+        result = run_script_handler(site, args.item_id, profile=profile)
+        out_path = write_artifact(result, Path(args.out_dir), args.date)
+        print(result.detail)
+        print(f"Wrote {out_path}")
+        return
+
+    if plan_path is None:
+        parser.error("--plan is required when --profile is not given")
 
     queue = build_queue(site, plan_path, items=items, profile=profile)
     md = render_markdown(queue, args.date)

@@ -25,7 +25,8 @@ Google guidance):
 3. Otherwise: add a row to `standard/extensions.md` with a fresh
    `CATEGORY-NNN` ID, a plain-English rule, a source, a weight (1-5), and a
    status (`open` if assessable today, `blocked` with a real unblock
-   requirement if not) — then a matching `@check(...)` in `checks_ext.py`.
+   requirement if not) — then a matching `@check(...)` in `checks_ext.py`
+   and a `@remediate` / `manual(...)` in `handlers.py`.
 4. Run `pytest`. Regenerate the report.
 
 If in doubt whether something is an engine-default candidate (genuinely
@@ -48,9 +49,19 @@ A website repo, before it's deployed (needs `local_dev` configured in
 python3 -m seo_geo_engine.crawl.run --profile site.yaml --local --out audits/data/site-crawl-<date>.json
 ```
 
+The crawl writes a site dict whose shape is the engine's data contract
+(`seo_geo_engine/crawler/site-dict.schema.json`, documented in
+`docs/design/data-contract.md`). Checks never fetch; if a field is missing
+they skip, fail, or return `blocked`.
+
+A real crawl needs Playwright Chromium in the engine's `crawler/` directory
+(`npm install` and `npx playwright install chromium`). `pip install` is not
+enough for that step.
+
 Optional enrichment (PageSpeed Insights, Search Console) is a separate,
-profile-invoked step — see the engine's own docs for the enrichment script
-contracts, if this profile uses them.
+profile-invoked step that merges keys into the same JSON — see
+`docs/design/enrichment.md`. Until that runs, PERF-002, PERF-003, and
+CRAWL-008 return `blocked` on a crawl-only dataset; that is expected.
 
 ## 3. Regenerate the report + remediation queue
 
@@ -58,9 +69,15 @@ contracts, if this profile uses them.
 python3 -m seo_geo_engine.report audits/data/site-crawl-<date>.json <date> "{{ORG_NAME}}" \
     --profile site.yaml --out-dir audits
 
+seo-geo-plan-sync audits/data/site-crawl-<date>.json --profile site.yaml
+
 python3 -m seo_geo_engine.remediation.plan audits/data/site-crawl-<date>.json <date> \
     --profile site.yaml --out-dir audits
 ```
+
+`seo-geo-plan-sync` appends rows for currently non-passing IDs and deletes
+rows whose verdict is now `pass`. That is the mechanical form of "re-crawl,
+confirm the flip, drop the row." Do not add or delete plan rows by hand.
 
 Optional static HTML dashboard (plain, deterministic, never AI-authored,
 never published through a hosted "Artifact" system — open it directly or
@@ -75,16 +92,26 @@ python3 -m seo_geo_engine.render_html_report \
 ## 4. Working the remediation queue
 
 Every non-passing item has exactly one row in `remediation-plan.md` and one
-registered handler in `handlers.py` (a `script` that drafts real fix
-content from crawl data, or `manual` pointing at a `playbooks/<ID>.md`
-procedure). Update a row's status as you work it — never hand-edit the
-Status/Notes cells directly:
+registered handler — usually an engine default (generic playbook, or a
+script for SCHEMA-001 / OG-002). `handlers.py` in this profile is only for
+extension IDs and CMS-specific overrides.
 
-```python
-from seo_geo_engine.remediation.remediation_loader import update_status
-update_status("SCHEMA-001", "in-progress", "remediation-plan.md", notes="Drafted, awaiting CMS access.")
+To draft a script artifact:
+
+```bash
+seo-geo-remediate audits/data/site-crawl-<date>.json <date> \
+    --profile site.yaml --id SCHEMA-001 --out-dir audits
+```
+
+That writes `audits/artifacts/<date>/<ID>.txt`. It does not publish, and it
+does not change the plan row. After you paste or commit the draft, mark
+status via the CLI — never hand-edit the Status/Notes cells:
+
+```bash
+seo-geo-update-status SCHEMA-001 in-progress --plan remediation-plan.md \
+    --notes "Drafted, awaiting CMS access."
 ```
 
 An item only stays in `remediation-plan.md` while it's non-passing — once a
-re-crawl flips its verdict to `pass`, delete the row and its handler/playbook.
-`pytest` enforces both directions.
+re-crawl flips its verdict to `pass`, `seo-geo-plan-sync` deletes the row.
+`pytest` enforces plan rows ↔ current non-passing set.
