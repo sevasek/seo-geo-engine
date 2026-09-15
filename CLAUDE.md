@@ -29,9 +29,8 @@ profile works").
   data reaches it via `site["profile"]`, never a second parameter, never an
   imported module-level constant.
 - `python3 -m pytest` must be green before every commit — the traceability
-  suite (standard row <-> `@check` <-> remediation row, once Phase 2 lands)
-  is what keeps the standard/code/remediation triangle from silently
-  drifting apart.
+  suite (standard row <-> `@check` <-> remediation row) is what keeps the
+  standard/code/remediation triangle from silently drifting apart.
 - Test text-matching heuristics against real (or realistic synthetic) data
   before trusting them — a regex that looks plausible is not the same as
   one that's been checked against actual crawl output.

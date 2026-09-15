@@ -46,7 +46,11 @@ contact-info patterns, extra standard rows — lives in a **profile** (a
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest                                    # engine's own test suite
+pytest                                    # engine's own test suite (fast tests only)
+
+# Only needed for an actual crawl (live URL or --local) — scoring an
+# already-captured crawl JSON, like the quickstart below, doesn't need this:
+(cd seo_geo_engine/crawler && npm install && npx playwright install chromium)
 
 # Score the synthetic "Acme Example Co" sample profile against the engine
 python3 -m seo_geo_engine.report \
