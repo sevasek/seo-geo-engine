@@ -34,6 +34,12 @@ crawl:
   sitemap_url: "https://www.acme-example.test/sitemap.xml"
   user_agent: "Mozilla/5.0 (compatible; AcmeExampleAuditBot/1.0)"
 
+# Property URL is a site fact (like base_url). API keys stay in the
+# environment — never commit them here. See docs/design/enrichment.md.
+enrichment:
+  pagespeed_api_key_env: PAGESPEED_API_KEY
+  gsc_property: "https://www.acme-example.test/"
+
 local_dev:
   # Stands in for a real website repo's own dev/build command (npm run dev,
   # a Docker-composed WordPress, ...) — the engine only knows how to run an

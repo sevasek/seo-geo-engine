@@ -21,7 +21,8 @@ profile works").
    is a profile-level blocker, not an engine one).
 3. **Unsure?** Ask, rather than picking silently — see the two real
    per-site repos this engine was generalized from for examples of this
-   judgment call going both ways.
+   judgment call going both ways. Broader sequencing lives in
+   [`docs/PLAN.md`](docs/PLAN.md).
 
 ## Engineering discipline carried over from the repos this generalizes
 
@@ -29,9 +30,8 @@ profile works").
   data reaches it via `site["profile"]`, never a second parameter, never an
   imported module-level constant.
 - `python3 -m pytest` must be green before every commit — the traceability
-  suite (standard row <-> `@check` <-> remediation row, once Phase 2 lands)
-  is what keeps the standard/code/remediation triangle from silently
-  drifting apart.
+  suite (standard row ↔ `@check` ↔ engine-owned remediation) is what keeps
+  the standard/code/remediation triangle from silently drifting apart.
 - Test text-matching heuristics against real (or realistic synthetic) data
   before trusting them — a regex that looks plausible is not the same as
   one that's been checked against actual crawl output.

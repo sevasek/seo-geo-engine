@@ -63,6 +63,10 @@ class SiteProfile:
 
     local_dev: dict = field(default_factory=dict)
 
+    # Post-crawl enrichment (PageSpeed Insights / Search Console). Holds
+    # the *names* of env vars and the GSC property URL — never the secrets.
+    enrichment: dict = field(default_factory=dict)
+
     disabled_ids: list[DisabledRule] = field(default_factory=list)
 
     standard_extension_paths: list[Path] = field(default_factory=list)
@@ -99,6 +103,7 @@ class SiteProfile:
                 "user_agent": self.user_agent,
             },
             "local_dev": self.local_dev,
+            "enrichment": self.enrichment,
         }
 
 
@@ -138,6 +143,7 @@ def load_profile(path: str | Path) -> SiteProfile:
         sitemap_url=crawl.get("sitemap_url", ""),
         user_agent=crawl.get("user_agent", ""),
         local_dev=data.get("local_dev", {}) or {},
+        enrichment=data.get("enrichment", {}) or {},
         disabled_ids=disabled,
         standard_extension_paths=ext_paths,
         checks_module=data.get("checks_module", ""),
@@ -149,13 +155,25 @@ def import_profile_code(profile: SiteProfile) -> None:
     """Import the profile's own checks_ext/handlers_ext modules (by dotted
     module name, resolved with the profile's own directory on sys.path) so
     their @check(...)/@remediate(...) decorators run. Call this once, before
-    running a report/remediation pass against this profile."""
+    running a report/remediation pass against this profile.
+
+    Engine remediations load first; the profile's handlers_module is then
+    imported with origin="profile" so it may overwrite an engine ID.
+    """
+    import seo_geo_engine.checks  # noqa: F401
+    import seo_geo_engine.remediation  # noqa: F401
+    from seo_geo_engine.remediation.remediation_framework import registration_origin
+
     if str(profile.root) not in sys.path:
         sys.path.insert(0, str(profile.root))
     if profile.checks_module:
         importlib.import_module(profile.checks_module)
-    if profile.handlers_module:
-        importlib.import_module(profile.handlers_module)
+    token = registration_origin.set("profile")
+    try:
+        if profile.handlers_module:
+            importlib.import_module(profile.handlers_module)
+    finally:
+        registration_origin.reset(token)
 
 
 def effective_standard(profile: SiteProfile, engine_default_paths: list[Path]) -> list[StandardItem]:

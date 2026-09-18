@@ -25,3 +25,12 @@ def test_changelog_exists_mentions_0_1_0_and_matches_pyproject():
     version = pyproject["project"]["version"]
     assert version == "0.1.0"
     assert version in changelog
+
+
+def test_versioning_policy_names_semver_for_pinned_profiles():
+    policy = (REPO_ROOT / "docs" / "design" / "versioning.md").read_text(
+        encoding="utf-8"
+    )
+    for token in ("MAJOR", "MINOR", "PATCH", "profile"):
+        assert token in policy, f"versioning policy must mention {token!r}"
+    assert ">=0.1,<0.2" in policy

@@ -26,6 +26,42 @@ the heading is not.
 
 ## [Unreleased]
 
+Work landed after the `v0.1.0` tag (still package version 0.1.0).
+
+### Added
+
+- Engine-owned remediations for every default standard ID, `seo-geo-plan-sync`,
+  `seo-geo-remediate --id`, `seo-geo-update-status`, crawl site-dict JSON
+  Schema, and GitHub Actions CI.
+- `seo-geo-enrich` post-crawl merge of PageSpeed Insights (mobile lab LCP/CLS)
+  and Search Console sitemap status. Optional extra: `[enrich]`.
+- Compatibility policy: `docs/design/versioning.md` (accepted). 0.x treated
+  like 1.x; profiles pin `seo-geo-engine>=0.1,<0.2`.
+
+### Standard IDs added
+
+None.
+
+### Standard IDs removed
+
+None.
+
+### Standard IDs reweighted
+
+None.
+
+### Crawl-contract field changes
+
+None in the crawler. `pageSpeed` and `searchConsole` are now produced by
+`seo-geo-enrich` (keys were already reserved in 0.1.0).
+
+### Migration notes for profiles
+
+- After upgrade, run `seo-geo-plan-sync` so engine-owned remediations
+  populate `remediation-plan.md`.
+- Optional: `pip install seo-geo-engine[enrich]` and `seo-geo-enrich` if
+  PERF-002 / PERF-003 / CRAWL-008 should leave runtime-blocked.
+
 ## [0.1.0] - 2026-09-11
 
 Initial extract of the engine (standard IDs as of current defaults,

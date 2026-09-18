@@ -1,0 +1,31 @@
+{
+  "id": "https://example.com/",
+  "captchaResult": "CAPTCHA_NOT_NEEDED",
+  "kind": "pagespeedonline#result",
+  "lighthouseResult": {
+    "requestedUrl": "https://example.com/",
+    "finalUrl": "https://example.com/",
+    "configSettings": {
+      "emulatedFormFactor": "mobile",
+      "formFactor": "mobile"
+    },
+    "audits": {
+      "cumulative-layout-shift": {
+        "id": "cumulative-layout-shift",
+        "title": "Cumulative Layout Shift",
+        "numericValue": 0.03,
+        "numericUnit": "unitless",
+        "displayValue": "0.03"
+      },
+      "experimental-interaction-to-next-paint": {
+        "id": "experimental-interaction-to-next-paint",
+        "title": "Interaction to Next Paint",
+        "numericValue": 188,
+        "numericUnit": "millisecond"
+      }
+    }
+  },
+  "loadingExperience": {
+    "initial_url": "https://example.com/"
+  }
+}
