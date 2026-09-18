@@ -46,7 +46,11 @@ contact-info patterns, extra standard rows — lives in a **profile** (a
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest                                    # engine's own test suite
+pytest                                    # engine's own test suite (fast tests only)
+
+# Only needed for an actual crawl (live URL or --local) — scoring an
+# already-captured crawl JSON, like the quickstart below, doesn't need this:
+(cd seo_geo_engine/crawler && npm install && npx playwright install chromium)
 
 # Score the synthetic "Acme Example Co" sample profile against the engine
 python3 -m seo_geo_engine.report \
@@ -82,11 +86,8 @@ python3 -m seo_geo_engine.render_html_report \
     --eyebrow "SEO / GEO Standard  ·  Acme Example Co" --title "SEO Scorecard"
 ```
 
-A live or local-serve crawl needs Playwright Chromium in
-`seo_geo_engine/crawler/` (`npm install` and `npx playwright install chromium`).
-`pip install -e ".[dev]"` is enough for scoring and the fast test suite, not
-for a real-browser crawl. Engineering decisions for the remaining loop live
-in [`docs/PLAN.md`](docs/PLAN.md).
+Engineering decisions for the remaining loop live in
+[`docs/PLAN.md`](docs/PLAN.md).
 
 The HTML dashboard is a plain, deterministic static file — open it directly,
 serve it with `python3 -m http.server`, or push it to any static host.
