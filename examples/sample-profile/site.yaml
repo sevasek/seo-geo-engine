@@ -2,6 +2,10 @@
 # business data. "Acme Example Co" is not a real company; every fact here
 # (address, phone, pages) is invented to match the shape a real profile's
 # site.yaml would have.
+#
+# 0.1.x compatibility canary: pytest in this repo scores this profile
+# against the engine. A change that turns it red without a fixture
+# update is either a real break or an incomplete commit.
 
 site:
   base_url: "https://www.acme-example.test"

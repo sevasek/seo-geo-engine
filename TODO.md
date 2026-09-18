@@ -150,14 +150,18 @@ URL/org name).
 
 ## D. Versioning policy (pure docs, smallest task here)
 
-- [ ] **D1. Write `VERSIONING.md`**: SemVer — MAJOR = breaking change to
-      the `site` dict shape, a check's return contract, or a CLI flag;
-      MINOR = new engine-default checks/standard rows added; PATCH =
-      bugfixes with no contract change. State that every MAJOR bump gets a
-      `CHANGELOG.md` entry naming exactly what a pinned profile must
-      change.
-      **Test:** file exists, mentions "MAJOR"/"MINOR"/"PATCH" and the word
-      "profile" (a pinned profile is who this policy is written for).
+- [x] **D1. Write the compatibility policy.** Lives at
+      [`docs/design/versioning.md`](docs/design/versioning.md) (not a
+      second root `VERSIONING.md`, which would drift). SemVer — MAJOR =
+      breaking change to the `site` dict shape, a check's return
+      contract, or a CLI flag; MINOR = new engine-default
+      checks/standard rows; PATCH = bugfixes with no contract change.
+      0.x is treated like 1.x. Every release's `CHANGELOG.md` names
+      what a pinned profile must change. Profiles pin
+      `seo-geo-engine>=0.1,<0.2`.
+      **Test:** `tests/test_versioning.py` — CHANGELOG matches
+      `pyproject.toml` version; policy file mentions MAJOR/MINOR/PATCH
+      and "profile".
 
 ## Definition of done for the whole backlog
 
@@ -168,5 +172,6 @@ URL/org name).
 - [ ] `sevasek-com-seo-audit`: same, with its own crawl fixture
 - [ ] MCP smoke-test script exercises all 5 tools against the sample
       profile without error
-- [ ] `VERSIONING.md` exists and reads like it's meant for a pinned
-      dependent, not just internal changelog hygiene
+- [x] Compatibility policy exists at `docs/design/versioning.md` and
+      reads like it's meant for a pinned dependent, with `CHANGELOG.md`
+      as the release record
