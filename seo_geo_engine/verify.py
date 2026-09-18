@@ -236,10 +236,12 @@ def run(argv: list[str] | None = None, *, stdout=None, stderr=None) -> int:
             why = "pass" if match.became_pass else "fraction increased"
             print(f"--id {args.item_id}: ok ({why})", file=out)
         else:
+            before_f = "none" if match.before_fraction is None else f"{match.before_fraction:.3f}"
+            after_f = "none" if match.after_fraction is None else f"{match.after_fraction:.3f}"
             print(
                 f"--id {args.item_id}: not improved "
                 f"({match.before_verdict or 'absent'} → {match.after_verdict or 'absent'}, "
-                f"fraction {match.before_fraction} → {match.after_fraction})",
+                f"fraction {before_f} → {after_f})",
                 file=out,
             )
             failed = True

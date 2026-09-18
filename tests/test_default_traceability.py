@@ -10,7 +10,10 @@ from seo_geo_engine.testing.traceability import (
 
 
 def test_every_default_standard_item_has_a_check():
-    assert_standard_has_full_check_coverage(default_standard_paths())
+    assert_standard_has_full_check_coverage(
+        default_standard_paths(),
+        check_module_prefix="seo_geo_engine.checks",
+    )
 
 
 def test_default_weights_in_range():
