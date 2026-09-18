@@ -49,37 +49,28 @@ pip install -e ".[dev]"
 pytest                                    # engine's own test suite
 
 # Score the synthetic "Acme Example Co" sample profile against the engine
-python3 -m seo_geo_engine.report \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
-    2026-09-10 "Acme Example Co (synthetic)" \
+cp examples/sample-profile/remediation-plan.md /tmp/acme-plan.md
+seo-geo-run \
     --profile examples/sample-profile/site.yaml \
-    --out-dir /tmp/acme-audit
-
-cp examples/sample-profile/remediation-plan.md /tmp/acme-audit/remediation-plan.md
-seo-geo-plan-sync \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
-    --profile examples/sample-profile/site.yaml \
-    --plan /tmp/acme-audit/remediation-plan.md
-
-python3 -m seo_geo_engine.remediation.plan \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
-    2026-09-10 \
-    --profile examples/sample-profile/site.yaml \
-    --plan /tmp/acme-audit/remediation-plan.md \
-    --out-dir /tmp/acme-audit
+    --from-crawl examples/sample-profile/fixtures/site-crawl-sample.json \
+    --date 2026-09-10 \
+    --out-dir /tmp/acme-audit \
+    --plan /tmp/acme-plan.md
 
 # Draft a script artifact (does not publish):
 seo-geo-remediate \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
+    /tmp/acme-audit/data/site-crawl-2026-09-10.json \
     2026-09-10 \
     --profile examples/sample-profile/site.yaml \
     --id SCHEMA-001 \
     --out-dir /tmp/acme-audit
 
-python3 -m seo_geo_engine.render_html_report \
-    /tmp/acme-audit/data/standard-report-2026-09-10.json \
-    /tmp/acme-audit/standard-report-2026-09-10.html \
-    --eyebrow "SEO / GEO Standard  ·  Acme Example Co" --title "SEO Scorecard"
+# After a later snapshot, confirm a flip (this sample crawl is unchanged,
+# so --id SCHEMA-001 correctly exits 1):
+seo-geo-verify \
+    --before /tmp/acme-audit/data/standard-report-2026-09-10.json \
+    --after  /tmp/acme-audit/data/standard-report-2026-09-10.json \
+    --require-not-worse
 ```
 
 A live or local-serve crawl needs Playwright Chromium in
@@ -118,7 +109,10 @@ seo_geo_engine/            — the installable package
   checks/                  — @check registry + built-in, non-business-specific checks
   profile.py                — SiteProfile: loads site.yaml, merges standard + site dict
   report.py                  — scoring, top-issues ranking, markdown/JSON report, CLI
+  run.py                     — seo-geo-run: crawl → optional enrich → report → plan-sync → queue → HTML
+  verify.py                  — seo-geo-verify: diff two dated report JSONs
   render_html_report.py      — deterministic static HTML dashboard generator
+  enrichment/                — post-crawl PageSpeed Insights / Search Console merge
   remediation/                — remediation-tracking layer (mirrors checks/)
   crawl/                      — crawler CLI + local-serve-and-crawl mode
   crawler/                    — the packaged Playwright crawler (crawl.js)
@@ -163,6 +157,12 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       libs are `pip install seo-geo-engine[enrich]`; credentials stay in
       the environment. See
       [docs/design/enrichment.md](docs/design/enrichment.md).
+- [x] Agent loop (engine side): `seo-geo-run` gathers a dated snapshot
+      (crawl → optional enrich → report → plan-sync → queue → HTML);
+      `seo-geo-verify` diffs two report JSONs (`--id`, `--require-not-worse`).
+      The Skill template sequences those commands. Proven against the
+      sample profile; a real-site verified flip still waits on Phase 3
+      migration. See [docs/design/agent-loop.md](docs/design/agent-loop.md).
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
       above to work today. See [docs/design/mcp.md](docs/design/mcp.md).

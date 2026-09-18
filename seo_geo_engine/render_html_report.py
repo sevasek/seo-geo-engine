@@ -47,13 +47,13 @@ def render(json_path: Path, out_path: Path, eyebrow: str = "SEO / GEO Standard",
     print(f"Wrote {out_path} ({len(data['items'])} items, score {data['score']['earned']}/{data['score']['possible']})")
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("json_path", type=Path)
     parser.add_argument("out_path", type=Path)
     parser.add_argument("--eyebrow", default="SEO / GEO Standard")
     parser.add_argument("--title", default="SEO Scorecard")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     render(args.json_path, args.out_path, args.eyebrow, args.title)
 
 

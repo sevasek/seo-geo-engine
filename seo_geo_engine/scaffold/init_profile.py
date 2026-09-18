@@ -146,10 +146,10 @@ the fallback).
 pip install seo-geo-engine  # or an editable local checkout during co-development
 python3 -m pytest
 
-# After a crawl:
-seo-geo-plan-sync audits/data/site-crawl-<date>.json --profile site.yaml
-seo-geo-report audits/data/site-crawl-<date>.json <date> "{org_name}" --profile site.yaml --out-dir audits
-seo-geo-remediate audits/data/site-crawl-<date>.json <date> --profile site.yaml --out-dir audits
+seo-geo-run --profile site.yaml --date <YYYY-MM-DD>
+seo-geo-remediate audits/data/site-crawl-<date>.json <date> --profile site.yaml --id SCHEMA-001 --out-dir audits
+seo-geo-verify --before audits/data/standard-report-<old>.json \\
+    --after audits/data/standard-report-<new>.json --id SCHEMA-001 --require-not-worse
 ```
 
 A real Playwright crawl also needs `npm install` and
