@@ -34,8 +34,8 @@ are means to that loop, not substitutes for it.
 The engine is a Python package (`seo-geo-engine` 0.1.0) plus a
 packaged Playwright crawler. A synthetic profile
 (`examples/sample-profile/`, "Acme Example Co") proves the pieces
-compose. As of the README's last count: 103 tests green (85 fast + 2
-slow Python, 16 JS).
+compose. Fast tests run in GitHub Actions on every PR; slow crawler
+tests run on pushes to main.
 
 ### The scoring triangle
 
@@ -81,30 +81,26 @@ external-presence data. Those keys exist on the site dict
 (`pageSpeed`, `searchConsole`, `externalPresence`) and checks already
 read them. `seo-geo-enrich` is the post-crawl merge that writes
 `pageSpeed` / `searchConsole`; `externalPresence` stays unused. See
-[design/enrichment.md](design/enrichment.md).
+[design/enrichment.md](design/enrichment.md) and
+[design/data-contract.md](design/data-contract.md).
 
-### Remediation (half-built)
+### Remediation
 
-The *tracking* layer is real: `@remediate` / `manual` registry,
-`remediation-plan.md` loader, `update_status()` so an agent doesn't
-hand-edit table cells, a points-lost queue (`seo-geo-remediate` today
-only *renders* that queue). The sample profile has two script handlers
-(SCHEMA-001, OG-002) and a playbook per remaining non-passing ID.
+The tracking layer, engine-owned remediations, and the commands that
+make a new profile operable are shipped:
 
-What is **not** in the engine:
-
-- No default playbooks or handlers for the 41 shipped rules. A
-  brand-new `seo-geo-init-profile` scaffold gets an empty
-  `remediation-plan.md` and empty `handlers.py`. The first real audit
-  produces fails with nothing to work.
-- No command that *runs* a script handler and writes its artifact.
-- No command that bootstraps or prunes `remediation-plan.md` from the
-  current non-passing set. The sample plan was authored to match its
-  fixture by hand.
-- Profile-level traceability (every non-passing ID has a row and a
-  handler) exists for the sample; CLAUDE.md's "standard ↔ check ↔
-  remediation" triangle for engine defaults is still waiting on
-  engine-owned remediations.
+- `@remediate` / `manual` registry with `origin` (`engine` then
+  `profile` may overwrite).
+- Default playbook per shipped standard ID under
+  `seo_geo_engine/remediation/playbooks/`, plus SCHEMA-001 and OG-002
+  script handlers. A profile's `handlers.py` only registers extension
+  IDs (and optional CMS-specific overrides).
+- `seo-geo-plan-sync` bootstraps and prunes `remediation-plan.md` from
+  the current non-passing set (empty plans are legal).
+- `seo-geo-remediate --id` runs a script handler and writes
+  `audits/artifacts/<date>/<ID>.txt`. It does not publish and does not
+  call `update_status`.
+- `seo-geo-update-status` is the CLI for `update_status()`.
 
 See [design/engine-owned-remediation.md](design/engine-owned-remediation.md).
 
@@ -133,9 +129,17 @@ Enrichment is a separate command (`seo-geo-enrich`) after crawl; see
 - Local-serve: boot a command, crawl localhost, confirm teardown.
 - Profile merge, scoring arithmetic, sample-profile remediation
   traceability, crawler unit tests (pure helpers, no browser).
+- Site-dict JSON Schema (`seo_geo_engine/crawler/site-dict.schema.json`)
+  against Layer 1 fixtures, the sample crawl, and the Layer 2 live crawl.
+- Engine-default remediations (every shipped ID has a handler; every
+  engine manual has a playbook file).
+- `seo-geo-plan-sync`, `seo-geo-remediate --id`, `seo-geo-update-status`,
+  and the scaffold's engine repo URL.
+- `seo-geo-enrich` against recorded PSI/GSC fixtures (no live Google).
 
-There is no GitHub Actions (or other CI) config in this repo yet.
-Default `pytest` excludes `slow`. Playwright Chromium is a separate
+GitHub Actions runs fast `pytest` plus crawler unit tests on every PR;
+`pytest -m slow` (Playwright Chromium) on pushes to main. Default
+`pytest` still excludes `slow`. Playwright Chromium is a separate
 `npx playwright install` — `pip install -e ".[dev]"` is not enough to
 run a real crawl.
 
@@ -153,20 +157,16 @@ run a real crawl.
 ### Honest gaps that the README doesn't spell out
 
 These are the reasons you cannot yet point this at a third site and
-walk away:
+walk away (Phase 1 closed the operable-queue gaps; Phase 2 closed the
+enrichment producer):
 
-| Gap | Why it blocks the loop |
+| Gap | Why it still blocks the loop |
 |---|---|
-| Engine-owned remediations missing | A new profile has a score and a list of fails, not a workable queue. |
-| No plan bootstrap | `remediation-plan.md` must be hand-kept in sync with whatever the latest crawl failed. |
-| Enrichment needs credentials | PERF-002, PERF-003, CRAWL-008 still runtime-block on a crawl-only JSON. `seo-geo-enrich` writes the blobs when keys are present (Phase 2, shipped). |
-| No verify-the-flip tool | Status can be set to `verified` without a re-crawl. The Skill says not to; the engine doesn't enforce it. |
-| No crawl JSON schema | Checks, fixtures, and the crawler agree by convention. Enrichment and profile authors currently reverse-engineer fixtures. |
+| Enrichment needs credentials | PERF-002, PERF-003, CRAWL-008 still runtime-block on a crawl-only JSON. `seo-geo-enrich` writes the blobs when keys are present. |
+| No verify-the-flip tool | Status can be set to `verified` without a re-crawl. The Skill says not to; the engine doesn't enforce it. Phase 4. |
 | Global `REGISTRY` | Importing two profiles in one process would collide on ID. Fine for CLI-per-profile; a future MCP/multi-site runner would not be. |
 | 9 blocked default rows | They occupy weight in the score with no path to earn it. A new site starts with a structural hole (CONTENT-004–008, LINK-006–008, PERF-004). |
 | LINK ID gap | Engine linking starts at LINK-004. LINK-001/002 live in the sample profile. LINK-003 does not exist. Leave it; don't backfill. |
-| No CI | The 103-test claim is a local fact, not a gate. |
-| Scaffold README github URL is a stub | `seo-geo-init-profile` writes `https://github.com/` as the engine link. |
 
 None of these are reasons to redo the architecture. The split
 (engine package + per-site profile, one `@check` per row, one
@@ -190,12 +190,27 @@ brand-new scaffolded profile passes its generated test.
 Shipped. Do not reopen by adding features here that belong in later
 phases.
 
-### Phase 1 — make a new profile operable
+### Phase 1 — make a new profile operable (shipped)
 
 This is "getting it up and running" for a *new* site that is willing
 to live with blocked enrichment-backed rules.
 
-**Build:**
+**Shipped:** crawl data contract + schema; engine-owned remediations
+for every default ID; `seo-geo-plan-sync`; `seo-geo-remediate --id`;
+`seo-geo-update-status`; GitHub Actions CI; scaffold engine URL +
+Skill pointers at `docs/design/`; engine-default remediation
+traceability. See the **Build** list below as the decision record.
+
+**Exit criterion (met):** `seo-geo-init-profile`, fill in `site.yaml`,
+score a crawl (no PSI/GSC keys), generate the report + plan + queue,
+run one script handler, mark a status via CLI, regenerate the HTML
+dashboard — all without copying engine code into the profile. Fast
+tests stay green in CI.
+
+A blocked PERF-002 on that first crawl is expected and acceptable.
+Un-blocking it is Phase 2.
+
+**Build (what landed):**
 
 1. **Crawl data contract** — write down the site-dict shape the
    crawler emits and checks already depend on. Treat it as the
@@ -212,11 +227,9 @@ to live with blocked enrichment-backed rules.
    rows whose verdict is now `pass`. This is what makes
    "re-crawl, confirm flip, delete the row" mechanical instead of a
    Skill instruction.
-4. **Run a script handler** — `seo-geo-remediate` (or a sibling)
-   actually invokes `@remediate` and writes the artifact to a dated
-   audits directory. Today it only prints the queue.
-5. **CLI for `update_status`** — the function exists; agents currently
-   have to write a Python snippet.
+4. **Run a script handler** — `seo-geo-remediate --id` invokes
+   `@remediate` and writes `audits/artifacts/<date>/<ID>.txt`.
+5. **CLI for `update_status`** — `seo-geo-update-status`.
 6. **CI** — GitHub Actions: `pytest` (fast) on every PR; `pytest -m
    slow` plus `node --test` on main or a nightly. Document Playwright
    install as a required crawl prerequisite, not a silent extra.
@@ -230,15 +243,6 @@ to live with blocked enrichment-backed rules.
    not require a remediation row for a rule that is passing on every
    fixture; remediations track *current* fails, not every ID in the
    abstract.
-
-**Exit criterion:** `seo-geo-init-profile`, fill in `site.yaml`, crawl
-a real URL (no PSI/GSC keys), generate the report + plan + queue, run
-one script handler, mark a status via CLI, regenerate the HTML
-dashboard — all without copying engine code into the profile. Fast
-tests stay green in CI.
-
-A blocked PERF-002 on that first crawl is expected and acceptable.
-Un-blocking it is Phase 2.
 
 ### Phase 2 — enrichment so "open" rules can actually pass (shipped)
 

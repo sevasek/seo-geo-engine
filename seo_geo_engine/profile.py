@@ -155,13 +155,25 @@ def import_profile_code(profile: SiteProfile) -> None:
     """Import the profile's own checks_ext/handlers_ext modules (by dotted
     module name, resolved with the profile's own directory on sys.path) so
     their @check(...)/@remediate(...) decorators run. Call this once, before
-    running a report/remediation pass against this profile."""
+    running a report/remediation pass against this profile.
+
+    Engine remediations load first; the profile's handlers_module is then
+    imported with origin="profile" so it may overwrite an engine ID.
+    """
+    import seo_geo_engine.checks  # noqa: F401
+    import seo_geo_engine.remediation  # noqa: F401
+    from seo_geo_engine.remediation.remediation_framework import registration_origin
+
     if str(profile.root) not in sys.path:
         sys.path.insert(0, str(profile.root))
     if profile.checks_module:
         importlib.import_module(profile.checks_module)
-    if profile.handlers_module:
-        importlib.import_module(profile.handlers_module)
+    token = registration_origin.set("profile")
+    try:
+        if profile.handlers_module:
+            importlib.import_module(profile.handlers_module)
+    finally:
+        registration_origin.reset(token)
 
 
 def effective_standard(profile: SiteProfile, engine_default_paths: list[Path]) -> list[StandardItem]:

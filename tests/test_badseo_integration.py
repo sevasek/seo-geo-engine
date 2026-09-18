@@ -93,6 +93,20 @@ def test_badseo_site_pilot_checks(tmp_path):
         server_proc.wait(timeout=5)
 
     site = json.loads(out_path.read_text())
+    jsonschema = pytest.importorskip("jsonschema")
+    from seo_geo_engine.paths import site_dict_schema_path
+
+    schema = json.loads(site_dict_schema_path().read_text(encoding="utf-8"))
+    jsonschema.Draft202012Validator(schema).validate(site)
+    for key in (
+        "sitemapUrls",
+        "robotsTxt",
+        "pages",
+        "discoveredNonSitemapPages",
+        "linkResolutions",
+    ):
+        assert key in site
+
     items = load_standard(default_standard_paths())
     results = run_report(site, items=items)
     by_id = {item.id: result for item, result in results}

@@ -98,8 +98,11 @@ def load_remediation_plan(path: Path) -> list[RemediationItem]:
             )
         )
 
-    if not items:
-        raise RemediationFormatError(f"No remediation rows found in {path} — check the table format")
+    if header_cells is None:
+        raise RemediationFormatError(
+            f"No remediation table found in {path} — expected a table with header "
+            f"ID | Approach | Depends on | Status | Notes"
+        )
 
     return items
 
@@ -150,3 +153,29 @@ def update_status(item_id: str, status: str, plan_path: Path, notes: str | None 
         raise RemediationFormatError(f"No remediation row for {item_id!r} found in {plan_path}")
 
     plan_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def main(argv: list[str] | None = None) -> None:
+    """CLI wrapper around update_status so an agent doesn't have to write a
+    Python snippet. Usage:
+
+        python3 -m seo_geo_engine.remediation.remediation_loader SCHEMA-001 in-progress \\
+            --plan remediation-plan.md [--notes "..."]
+    """
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="Update one remediation-plan.md row's Status (and optionally Notes)."
+    )
+    parser.add_argument("item_id", help="standard ID, e.g. SCHEMA-001")
+    parser.add_argument("status", choices=sorted(VALID_STATUSES))
+    parser.add_argument("--plan", required=True, help="path to remediation-plan.md")
+    parser.add_argument("--notes", default=None, help="replace the Notes cell; omit to leave it")
+    args = parser.parse_args(argv if argv is not None else sys.argv[1:])
+    update_status(args.item_id, args.status, Path(args.plan), notes=args.notes)
+    print(f"Updated {args.item_id} -> {args.status} in {args.plan}")
+
+
+if __name__ == "__main__":
+    main()
