@@ -1,9 +1,11 @@
 # Phased plan
 
-The README already states the end state. This document is the
-engineering path from "the engine works on a synthetic profile" to
-"point this at a real site repo and an agent can take the score from
-wherever it starts to a verified result."
+The README already states the end state. [SYSTEM.md](SYSTEM.md) is the
+**site plan**: goals vs objectives, the infrastructures that stand or
+still need erecting, and how they relate. This document is the
+**construction schedule** from "the engine works on a synthetic
+profile" to "point this at a real site repo and an agent can take the
+score from wherever it starts to a verified result."
 
 ## Goal (what "up and running" means)
 
@@ -79,9 +81,9 @@ localhost through the identical pipeline.
 The crawler does **not** fetch PageSpeed Insights, Search Console, or
 external-presence data. Those keys exist on the site dict
 (`pageSpeed`, `searchConsole`, `externalPresence`) and checks already
-read them. `seo-geo-enrich` is the post-crawl merge that writes
-`pageSpeed` / `searchConsole`; `externalPresence` stays unused. See
-[design/enrichment.md](design/enrichment.md) and
+read them. `seo-geo-enrich` (also invoked from `seo-geo-run --enrich`)
+writes `pageSpeed` / `searchConsole`; `externalPresence` stays unused.
+See [design/enrichment.md](design/enrichment.md) and
 [design/data-contract.md](design/data-contract.md).
 
 ### Remediation
@@ -113,10 +115,12 @@ See [design/engine-owned-remediation.md](design/engine-owned-remediation.md).
   generated traceability test with zero hand-written logic beyond
   `site.yaml`.
 
-The Skill tells an agent which commands to run. It does not close the
-loop: there is no verify-the-flip command and no single orchestrator.
-Enrichment is a separate command (`seo-geo-enrich`) after crawl; see
-[design/enrichment.md](design/enrichment.md).
+The Skill tells an agent which commands to run. `seo-geo-run` is the
+gather-and-score orchestrator; `seo-geo-verify` diffs two dated JSON
+reports (`--id`, `--require-not-worse`). Enrichment is also available
+standalone as `seo-geo-enrich`. See
+[design/agent-loop.md](design/agent-loop.md). A verified flip on a
+*real* migrated profile is still the rest of Phase 4, after Phase 3.
 
 ### Tests
 
@@ -136,6 +140,8 @@ Enrichment is a separate command (`seo-geo-enrich`) after crawl; see
 - `seo-geo-plan-sync`, `seo-geo-remediate --id`, `seo-geo-update-status`,
   and the scaffold's engine repo URL.
 - `seo-geo-enrich` against recorded PSI/GSC fixtures (no live Google).
+- `seo-geo-run --from-crawl` and `seo-geo-verify` against the sample
+  profile and synthetic report JSON.
 
 GitHub Actions runs fast `pytest` plus crawler unit tests on every PR;
 `pytest -m slow` (Playwright Chromium) on pushes to main. Default
@@ -158,13 +164,13 @@ run a real crawl.
 ### Honest gaps that the README doesn't spell out
 
 These are the reasons you cannot yet point this at a third site and
-walk away (Phase 1 closed the operable-queue gaps; Phase 2 closed the
-enrichment producer):
+walk away (Phase 1–2 closed the operable-queue and enrichment-producer
+gaps; engine-side Phase 4 commands are shipped):
 
 | Gap | Why it still blocks the loop |
 |---|---|
-| Enrichment needs credentials | PERF-002, PERF-003, CRAWL-008 still runtime-block on a crawl-only JSON. `seo-geo-enrich` writes the blobs when keys are present. |
-| No verify-the-flip tool | Status can be set to `verified` without a re-crawl. The Skill says not to; the engine doesn't enforce it. Phase 4. |
+| Real-site migration | Engine commands close the loop on the synthetic sample. A verified flip on a living audit still needs Phase 3. |
+| Enrichment needs credentials | PERF-002, PERF-003, CRAWL-008 still runtime-block on a crawl-only JSON. `seo-geo-enrich` / `seo-geo-run --enrich` write the blobs when keys are present. |
 | Global `REGISTRY` | Importing two profiles in one process would collide on ID. Fine for CLI-per-profile; a future MCP/multi-site runner would not be. |
 | 9 blocked default rows | They occupy weight in the score with no path to earn it. A new site starts with a structural hole (CONTENT-004–008, LINK-006–008, PERF-004). |
 | LINK ID gap | Engine linking starts at LINK-004. LINK-001/002 live in the sample profile. LINK-003 does not exist. Leave it; don't backfill. |
@@ -254,9 +260,10 @@ runtime-block and occupy score weight as a hole.
 
 **Build (what landed):** the post-crawl enricher specified in
 [design/enrichment.md](design/enrichment.md) — `seo-geo-enrich`
-`--pagespeed` / `--gsc`, optional `[enrich]` extra for GSC client
-libs. Credentials stay in the environment (or an env-var *name* in
-the profile), never in the engine. The crawler stays auth-free.
+`--pagespeed` / `--gsc` (also `seo-geo-run --enrich`), optional
+`[enrich]` extra for GSC client libs. Credentials stay in the
+environment (or an env-var *name* in the profile), never in the
+engine. The crawler stays auth-free.
 
 Also in this phase: the three kinds of "blocked" (no signal / missing
 enrichment / needs a profile map) in
@@ -297,31 +304,32 @@ regenerated from the engine, not from leftover forked `report.py`. The
 old forked copies of `framework.py` / `standard_loader.py` /
 `report.py` are gone from that repo.
 
-### Phase 4 — close the agent loop on that real site
+### Phase 4 — close the agent loop (engine commands shipped)
 
-Only after Phase 3, because a Skill working a synthetic queue teaches
-the wrong lessons (playbooks that say "this is illustrative").
+The Skill working a synthetic queue still teaches the wrong *editorial*
+lessons (playbooks that say "this is illustrative") — a verified flip
+on a migrated profile remains the rest of this phase, after Phase 3.
+The engine-side operator path is shipped so a real profile can use it
+on day one of the migration.
 
-**Build:** the operator path in [design/agent-loop.md](design/agent-loop.md):
+**Shipped:** the operator path in [design/agent-loop.md](design/agent-loop.md):
 
-- One orchestrator CLI (`seo-geo-run` or equivalent): crawl → optional
-  enrich → report → bootstrap/prune plan → queue → HTML.
-- `seo-geo-verify` (or a mode of report): diff two dated JSON reports,
-  list IDs whose verdict changed, refuse to treat `update_status(...,
-  "verified")` as meaningful unless the after-report says `pass`.
-- Skill rewrite against those commands, using the migrated profile as
-  the worked example (the Skill itself stays templated / org-name
-  substituted — the *procedure* is what gets real).
-- Optionally wire the PR-review routine to that profile's CI.
+- `seo-geo-run`: crawl → optional enrich → report → plan-sync → queue → HTML.
+  `--from-crawl` reuses an existing snapshot (the test/fixture path).
+- `seo-geo-verify`: diff two dated JSON reports; `--id` asserts pass or a
+  strictly higher fraction; `--require-not-worse` fails on pass→fail or
+  a dropped fraction.
+- Skill rewrite against those commands. The template stays org-name
+  substituted — the procedure is what got real.
 
-Work the queue for real: at least one script artifact applied and
-verified by re-crawl, and at least one manual playbook followed to a
-flipped verdict. That is the proof the engine was generalized *from*
-those two repos rather than merely extracted.
+**Still open:** work the queue for real on a migrated profile (at least
+one script artifact applied and verified by re-crawl, and at least one
+manual playbook followed to a flipped verdict).
 
-**Exit criterion:** on the migrated profile, an agent following only
-the scaffolded Skill (plus engine docs) can take a non-passing item
-to a verified pass without being told extra procedure in chat.
+**Exit criterion (engine half met):** `seo-geo-run --from-crawl` plus
+`seo-geo-verify` are green against the sample profile. The migrated-profile
+half — an agent following only the scaffolded Skill can take a
+non-passing item to a verified pass — still waits on Phase 3.
 
 ### Phase 5 — second migration + standard evolution
 
@@ -366,9 +374,15 @@ item rotting.
 
 ## How to use this document
 
-When a new idea shows up, put it in a phase or reject it against "What
-not to do." If it needs a design decision, add or amend a file under
-`docs/design/` *before* writing the code — the files in this directory
-are the decisions, not a promise that the code already matches them.
-After a phase lands, update the README Status checklist and this
-plan's "What's already built" so the three can't drift.
+When a new idea shows up, name the infrastructure it belongs to in
+[SYSTEM.md](SYSTEM.md) (or reject it against that file's non-goals /
+this file's "What not to do"). If it needs a design decision, add or
+amend a file under `docs/design/` *before* writing the code — the
+files in this directory are the decisions, not a promise that the
+code already matches them. Put accepted work in a phase below. After
+a phase lands, update the README Status checklist, SYSTEM.md's status
+cells, and this plan's "What's already built" so the three can't
+drift.
+
+SYSTEM.md is the site plan (goals, infrastructures, relationships).
+This file is the construction schedule. Do not duplicate the map here.

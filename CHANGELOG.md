@@ -37,6 +37,8 @@ Work landed after the `v0.1.0` tag (still package version 0.1.0).
   and Search Console sitemap status. Optional extra: `[enrich]`.
 - Compatibility policy: `docs/design/versioning.md` (accepted). 0.x treated
   like 1.x; profiles pin `seo-geo-engine>=0.1,<0.2`.
+- `seo-geo-run` (crawl → optional enrich → report → plan-sync → queue → HTML)
+  and `seo-geo-verify` (diff two report JSONs; `--id`, `--require-not-worse`).
 
 ### Standard IDs added
 

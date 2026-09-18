@@ -6,6 +6,17 @@ no URL, business name, address/phone pattern, or entity/cluster map ever
 belongs here. That content lives in a profile (see README.md's "How a
 profile works").
 
+**Read [`docs/SYSTEM.md`](docs/SYSTEM.md) first** if you are building or
+extending this package: goals vs objectives, the infrastructures
+(profile, crawl contract, gather, score, remediate, operator path,
+trust, versioning, MCP, legacy forks), and how they join. Sequencing
+of remaining construction is [`docs/PLAN.md`](docs/PLAN.md). Design
+docs under `docs/design/` are the trade-off records for one
+infrastructure, not a second backlog.
+
+If you are **auditing a site**, this is the wrong file — use that
+profile's scaffolded Skill.
+
 ## Decision procedure: does something belong in the engine or a profile?
 
 1. **Does it require a fact about one specific business** (a URL, an entity
@@ -22,7 +33,9 @@ profile works").
 3. **Unsure?** Ask, rather than picking silently — see the two real
    per-site repos this engine was generalized from for examples of this
    judgment call going both ways. Broader sequencing lives in
-   [`docs/PLAN.md`](docs/PLAN.md).
+   [`docs/PLAN.md`](docs/PLAN.md). Put a new idea on an infrastructure
+   in [`docs/SYSTEM.md`](docs/SYSTEM.md) or reject it as a non-goal;
+   do not invent a parallel scoring path.
 
 ## Engineering discipline carried over from the repos this generalizes
 
@@ -40,3 +53,6 @@ profile works").
   `report.py`.
 - Never hand-edit a generated report — regenerate it from the standard/check
   code instead.
+- After a phase or infrastructure lands, update README Status,
+  `docs/PLAN.md`'s "already built", and `docs/SYSTEM.md` status cells
+  together so the three cannot drift.

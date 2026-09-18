@@ -27,7 +27,11 @@ from seo_geo_engine.remediation.remediation_framework import REGISTRY as REMEDIA
 from seo_geo_engine.remediation.remediation_framework import playbook_path
 
 
-def assert_standard_has_full_check_coverage(paths: list[Path]) -> None:
+def assert_standard_has_full_check_coverage(
+    paths: list[Path],
+    *,
+    check_module_prefix: str | None = None,
+) -> None:
     by_id = load_standard_by_id(paths)
     standard_ids = set(by_id)
     registered_ids = set(REGISTRY)
@@ -39,6 +43,16 @@ def assert_standard_has_full_check_coverage(paths: list[Path]) -> None:
     )
 
     orphan_checks = registered_ids - standard_ids
+    if check_module_prefix is not None:
+        # Engine-defaults tests may run after a profile has been imported in
+        # the same process (global REGISTRY). Only treat engine-module checks
+        # as orphans against the default standard; a profile's own test
+        # passes the effective-standard paths and leaves this unset.
+        orphan_checks = {
+            item_id
+            for item_id in orphan_checks
+            if REGISTRY[item_id].fn.__module__.startswith(check_module_prefix)
+        }
     assert not orphan_checks, (
         f"These @check(...) functions are registered but no standard row claims them: "
         f"{sorted(orphan_checks)}. Add the row, or remove the check."

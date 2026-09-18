@@ -25,6 +25,15 @@ repeat again next quarter as the standard itself evolves. A profile is
 cheap enough to add that a new client site is a `site.yaml` and maybe a
 handful of rows, not a new repo to maintain in lockstep with the last one.
 
+**Agents building or extending this engine:** read
+[`docs/SYSTEM.md`](docs/SYSTEM.md) before writing code. It states the
+goal vs the measurable objectives, names each infrastructure (profile,
+crawl contract, gather, score, remediate, operator path, trust,
+versioning, MCP, legacy forks), and how those pieces join — including
+what still needs erecting and what must not be built. [`docs/PLAN.md`](docs/PLAN.md)
+is the construction schedule for that map. Auditing a *site* uses that
+profile's Skill, not SYSTEM.md.
+
 This build is the engine and one worked example (`examples/sample-profile/`,
 entirely synthetic). The two real site-specific repos this generalizes —
 `auto-ps-seo-audit` and `sevasek-com-seo-audit` — still run their own
@@ -53,42 +62,35 @@ pytest                                    # engine's own test suite (fast tests 
 (cd seo_geo_engine/crawler && npm install && npx playwright install chromium)
 
 # Score the synthetic "Acme Example Co" sample profile against the engine
-python3 -m seo_geo_engine.report \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
-    2026-09-10 "Acme Example Co (synthetic)" \
+cp examples/sample-profile/remediation-plan.md /tmp/acme-plan.md
+seo-geo-run \
     --profile examples/sample-profile/site.yaml \
-    --out-dir /tmp/acme-audit
-
-cp examples/sample-profile/remediation-plan.md /tmp/acme-audit/remediation-plan.md
-seo-geo-plan-sync \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
-    --profile examples/sample-profile/site.yaml \
-    --plan /tmp/acme-audit/remediation-plan.md
-
-python3 -m seo_geo_engine.remediation.plan \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
-    2026-09-10 \
-    --profile examples/sample-profile/site.yaml \
-    --plan /tmp/acme-audit/remediation-plan.md \
-    --out-dir /tmp/acme-audit
+    --from-crawl examples/sample-profile/fixtures/site-crawl-sample.json \
+    --date 2026-09-10 \
+    --out-dir /tmp/acme-audit \
+    --plan /tmp/acme-plan.md
 
 # Draft a script artifact (does not publish):
 seo-geo-remediate \
-    examples/sample-profile/fixtures/site-crawl-sample.json \
+    /tmp/acme-audit/data/site-crawl-2026-09-10.json \
     2026-09-10 \
     --profile examples/sample-profile/site.yaml \
     --id SCHEMA-001 \
     --out-dir /tmp/acme-audit
 
-python3 -m seo_geo_engine.render_html_report \
-    /tmp/acme-audit/data/standard-report-2026-09-10.json \
-    /tmp/acme-audit/standard-report-2026-09-10.html \
-    --eyebrow "SEO / GEO Standard  ·  Acme Example Co" --title "SEO Scorecard"
+# After a later snapshot, confirm a flip (this sample crawl is unchanged,
+# so --id SCHEMA-001 correctly exits 1):
+seo-geo-verify \
+    --before /tmp/acme-audit/data/standard-report-2026-09-10.json \
+    --after  /tmp/acme-audit/data/standard-report-2026-09-10.json \
+    --id SCHEMA-001 \
+    --require-not-worse
 ```
 
 Engineering decisions for the remaining loop live in
-[`docs/PLAN.md`](docs/PLAN.md). Optional post-crawl enrichment
-(`seo-geo-enrich --pagespeed --gsc`) is documented there and in
+[`docs/SYSTEM.md`](docs/SYSTEM.md) (map) and [`docs/PLAN.md`](docs/PLAN.md)
+(schedule). Optional post-crawl enrichment (`seo-geo-enrich` or
+`seo-geo-run --enrich pagespeed,gsc`) is documented in
 [`docs/design/enrichment.md`](docs/design/enrichment.md).
 
 The HTML dashboard is a plain, deterministic static file — open it directly,
@@ -121,7 +123,10 @@ seo_geo_engine/            — the installable package
   checks/                  — @check registry + built-in, non-business-specific checks
   profile.py                — SiteProfile: loads site.yaml, merges standard + site dict
   report.py                  — scoring, top-issues ranking, markdown/JSON report, CLI
+  run.py                     — seo-geo-run: crawl → optional enrich → report → plan-sync → queue → HTML
+  verify.py                  — seo-geo-verify: diff two dated report JSONs
   render_html_report.py      — deterministic static HTML dashboard generator
+  enrichment/                — post-crawl PageSpeed Insights / Search Console merge
   remediation/                — remediation-tracking layer (mirrors checks/)
   crawl/                      — crawler CLI + local-serve-and-crawl mode
   crawler/                    — the packaged Playwright crawler (crawl.js)
@@ -130,7 +135,7 @@ seo_geo_engine/            — the installable package
   standard/default/           — the engine's shipped, non-business-specific rule set
   skills/, routines/           — Skill/governance-routine templates a profile scaffolds
   scaffold/                    — `seo-geo-init-profile` — scaffold a new profile
-docs/                         — PLAN.md + design docs for the remaining loop
+docs/                         — SYSTEM.md (map) + PLAN.md (schedule) + design docs
 tests/                        — the engine's own test suite (fixtures + traceability)
 examples/sample-profile/       — synthetic worked example, not a real dependent
 ```
@@ -154,20 +159,26 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
 - [x] Skill template + `seo-geo-init-profile` scaffold command — a
       brand-new profile passes its own generated test with zero
       hand-written logic beyond `site.yaml`. Fast pytest (including the
-      new plan-sync / schema / scaffold / enrichment coverage) plus 16 JS
-      crawler unit tests; slow Playwright tests on main.
+      new plan-sync / schema / scaffold / enrichment / agent-loop coverage)
+      plus 16 JS crawler unit tests; slow Playwright tests on main.
 - [x] Engine-owned remediations for every default standard ID (generic
       playbooks + SCHEMA-001 / OG-002 script handlers), `seo-geo-plan-sync`
       to bootstrap/prune `remediation-plan.md`, `seo-geo-remediate --id` to
       run a script handler, `seo-geo-update-status` CLI, crawl site-dict
       JSON Schema, and GitHub Actions CI. A new profile can be crawled,
       scored, queued, and worked without copying engine code. See
-      [docs/PLAN.md](docs/PLAN.md).
+      [docs/SYSTEM.md](docs/SYSTEM.md) and [docs/PLAN.md](docs/PLAN.md).
 - [x] Enrichment: `seo-geo-enrich` post-crawl merge of PageSpeed Insights
       (mobile lab LCP/CLS) and Search Console sitemap status. GSC client
       libs are `pip install seo-geo-engine[enrich]`; credentials stay in
       the environment. See
       [docs/design/enrichment.md](docs/design/enrichment.md).
+- [x] Agent loop (engine side): `seo-geo-run` gathers a dated snapshot
+      (crawl → optional enrich → report → plan-sync → queue → HTML);
+      `seo-geo-verify` diffs two report JSONs (`--id`, `--require-not-worse`).
+      The Skill template sequences those commands. Proven against the
+      sample profile; a real-site verified flip still waits on a live
+      migration. See [docs/design/agent-loop.md](docs/design/agent-loop.md).
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
       above to work today. See [docs/design/mcp.md](docs/design/mcp.md).

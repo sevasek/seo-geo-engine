@@ -12,6 +12,13 @@ decision procedure on which one a new rule belongs in. This file assumes
 that repo is installed (`pip install seo-geo-engine`, or an editable local
 checkout during co-development).
 
+This Skill is the **runbook for auditing {{ORG_NAME}}**. How the engine
+itself is built — goals, infrastructures (crawler, contract, scoring
+triangle, remediations, verify, versioning), and what still needs
+erecting — lives in that repo's `docs/SYSTEM.md`. Do not add engine
+kernel code to this profile; if a change needs a business fact it
+belongs here, otherwise it belongs in the engine.
+
 ## 1. Evolving the standard
 
 When a new SEO/GEO angle comes up (a tweet, a competitor page, a piece of
@@ -36,71 +43,66 @@ site-agnostic) vs. this profile's own extension (needs a fact specific to
 
 ## 2. Gathering data
 
-Live URL:
+One command gathers a dated snapshot and scores it. Do not reconstruct the
+individual crawl/report/plan-sync/queue/HTML flags unless you are debugging
+a single step.
+
+Live URL (needs Playwright Chromium in the engine's `crawler/` directory —
+`npm install` and `npx playwright install chromium`; `pip install` is not
+enough for that step):
 
 ```bash
-python3 -m seo_geo_engine.crawl.run --profile site.yaml --out audits/data/site-crawl-<date>.json
+seo-geo-run --profile site.yaml --date <YYYY-MM-DD>
 ```
 
 A website repo, before it's deployed (needs `local_dev` configured in
 `site.yaml`):
 
 ```bash
-python3 -m seo_geo_engine.crawl.run --profile site.yaml --local --out audits/data/site-crawl-<date>.json
+seo-geo-run --profile site.yaml --local --date <YYYY-MM-DD>
 ```
+
+Already have a crawl JSON (no live fetch):
+
+```bash
+seo-geo-run --profile site.yaml --from-crawl audits/data/site-crawl-<date>.json --date <YYYY-MM-DD>
+```
+
+Optional PageSpeed Insights / Search Console merge, after crawl, same
+invocation — either token may be omitted; without it PERF-002, PERF-003,
+and CRAWL-008 stay runtime-blocked. See `docs/design/enrichment.md`.
+
+```bash
+seo-geo-run --profile site.yaml --enrich pagespeed,gsc --date <YYYY-MM-DD>
+```
+
+`--pagespeed` needs `PAGESPEED_API_KEY` (or the env var named by
+`profile.enrichment.pagespeed_api_key_env`) and is refused for localhost /
+`.test` / private IPs. `--gsc` needs `pip install seo-geo-engine[enrich]`
+plus ADC or `GSC_CREDENTIALS_JSON`, and `profile.enrichment.gsc_property`.
 
 The crawl writes a site dict whose shape is the engine's data contract
 (`seo_geo_engine/crawler/site-dict.schema.json`, documented in
 `docs/design/data-contract.md`). Checks never fetch; if a field is missing
 they skip, fail, or return `blocked`.
 
-A real crawl needs Playwright Chromium in the engine's `crawler/` directory
-(`npm install` and `npx playwright install chromium`). `pip install` is not
-enough for that step.
+## 3. The report + remediation queue
 
-Optional enrichment is a separate, profile-invoked step after crawl
-(PageSpeed Insights, Search Console). Either flag may be omitted —
-without it, PERF-002, PERF-003, and CRAWL-008 stay runtime-blocked:
+`seo-geo-run` already wrote, under `--out-dir` (default `audits/`):
 
-```bash
-seo-geo-enrich audits/data/site-crawl-<date>.json \
-    --profile site.yaml \
-    --pagespeed \
-    --gsc
-```
+- `data/site-crawl-<date>.json`
+- `standard-report-<date>.md` and `data/standard-report-<date>.json`
+- `remediation-queue-<date>.md`
+- `standard-report-<date>.html`
 
-`--pagespeed` needs `PAGESPEED_API_KEY` (or the env var named by
-`profile.enrichment.pagespeed_api_key_env`) and is refused for
-localhost / `.test` / private IPs. `--gsc` needs
-`pip install seo-geo-engine[enrich]` plus ADC or `GSC_CREDENTIALS_JSON`,
-and `profile.enrichment.gsc_property`. Default `--out` overwrites the
-crawl JSON in place. See `docs/design/enrichment.md`.
+and synced `remediation-plan.md` (add currently non-passing IDs, delete
+rows whose verdict is now `pass`). Do not hand-edit the generated report,
+queue, or HTML dashboard — regenerate with another `seo-geo-run`. Do not
+add or delete plan rows by hand; use `seo-geo-update-status` for
+Status/Notes.
 
-## 3. Regenerate the report + remediation queue
-
-```bash
-python3 -m seo_geo_engine.report audits/data/site-crawl-<date>.json <date> "{{ORG_NAME}}" \
-    --profile site.yaml --out-dir audits
-
-seo-geo-plan-sync audits/data/site-crawl-<date>.json --profile site.yaml
-
-python3 -m seo_geo_engine.remediation.plan audits/data/site-crawl-<date>.json <date> \
-    --profile site.yaml --out-dir audits
-```
-
-`seo-geo-plan-sync` appends rows for currently non-passing IDs and deletes
-rows whose verdict is now `pass`. That is the mechanical form of "re-crawl,
-confirm the flip, drop the row." Do not add or delete plan rows by hand.
-
-Optional static HTML dashboard (plain, deterministic, never AI-authored,
-never published through a hosted "Artifact" system — open it directly or
-serve it with any static host):
-
-```bash
-python3 -m seo_geo_engine.render_html_report \
-    audits/data/standard-report-<date>.json audits/standard-report-<date>.html \
-    --eyebrow "SEO / GEO Standard  ·  {{ORG_NAME}}" --title "SEO Scorecard"
-```
+The HTML dashboard is a plain, deterministic static file — never
+AI-authored, never published through a hosted "Artifact" system.
 
 ## 4. Working the remediation queue
 
@@ -109,22 +111,50 @@ registered handler — usually an engine default (generic playbook, or a
 script for SCHEMA-001 / OG-002). `handlers.py` in this profile is only for
 extension IDs and CMS-specific overrides.
 
-To draft a script artifact:
+Crawls are slow. Batch a few `applied` items, then one re-run, then verify
+the batch — do not re-crawl after every single ID.
 
-```bash
-seo-geo-remediate audits/data/site-crawl-<date>.json <date> \
-    --profile site.yaml --id SCHEMA-001 --out-dir audits
-```
+Per ready item (no `depends_on`):
 
-That writes `audits/artifacts/<date>/<ID>.txt`. It does not publish, and it
-does not change the plan row. After you paste or commit the draft, mark
-status via the CLI — never hand-edit the Status/Notes cells:
+1. `seo-geo-update-status <ID> in-progress --plan remediation-plan.md`
+2. If `script`:
 
-```bash
-seo-geo-update-status SCHEMA-001 in-progress --plan remediation-plan.md \
-    --notes "Drafted, awaiting CMS access."
-```
+   ```bash
+   seo-geo-remediate audits/data/site-crawl-<date>.json <date> \
+       --profile site.yaml --id <ID> --out-dir audits
+   ```
 
-An item only stays in `remediation-plan.md` while it's non-passing — once a
-re-crawl flips its verdict to `pass`, `seo-geo-plan-sync` deletes the row.
-`pytest` enforces plan rows ↔ current non-passing set.
+   That writes `audits/artifacts/<date>/<ID>.txt`. It does not publish, and
+   it does not change the plan row. Apply the artifact in the **website**
+   repo or CMS (out of this profile). Committing it here instead of the
+   site is a common miss — `seo-geo-verify` will then correctly show no
+   flip, because the crawl is unchanged.
+3. If `manual`: follow the playbook (engine default under
+   `seo_geo_engine/remediation/playbooks/`, or a profile override in
+   `playbooks/`).
+4. `seo-geo-update-status <ID> applied --plan remediation-plan.md` only
+   when the change is actually published or committed to the site, not
+   when the artifact file is written. Use status `verified` only as the
+   in-between "waiting on deploy/re-crawl" marker — the engine never sets
+   it as a side-effect of drafting.
+5. After a batch: `seo-geo-run` again with a **new** date (same date
+   overwrites the snapshot).
+6. Confirm the flip against the previous JSON report:
+
+   ```bash
+   seo-geo-verify \
+       --before audits/data/standard-report-<old-date>.json \
+       --after  audits/data/standard-report-<new-date>.json \
+       --id <ID> \
+       --require-not-worse
+   ```
+
+   `--id` exits 0 only if that ID is now `pass` or its earned fraction
+   strictly increased. `--require-not-worse` exits 1 if any ID moved
+   pass→fail or lost fraction. An unchanged crawl fails both, which is
+   the correct failure.
+
+An item only stays in `remediation-plan.md` while it's non-passing — once
+a re-crawl flips its verdict to `pass`, `seo-geo-plan-sync` (inside
+`seo-geo-run`) deletes the row. That is a stronger close than a Status
+cell. `pytest` enforces plan rows ↔ current non-passing set.

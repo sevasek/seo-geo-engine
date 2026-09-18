@@ -30,6 +30,8 @@ seo-geo-update-status = "seo_geo_engine.remediation.remediation_loader:main"
 seo-geo-crawl = "seo_geo_engine.crawl.run:main"
 seo-geo-init-profile = "seo_geo_engine.scaffold.init_profile:main"
 seo-geo-enrich = "seo_geo_engine.enrichment.cli:main"
+seo-geo-run = "seo_geo_engine.run:main"
+seo-geo-verify = "seo_geo_engine.verify:main"
 
 [tool.setuptools.packages.find]
 include = ["seo_geo_engine*"]

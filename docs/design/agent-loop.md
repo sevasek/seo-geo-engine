@@ -1,8 +1,9 @@
 # Design: the agent loop
 
-**Status:** proposed (Phase 4 to close; Phase 1–2 build the commands
-it needs). The Skill template already describes the happy path in
-prose. The engine does not yet enforce it.
+**Status:** implemented (engine commands, Phase 4). `seo-geo-run` and
+`seo-geo-verify` exist; the Skill template invokes them. The real-site
+exit criterion (a verified flip on a migrated profile) still waits on
+Phase 3's live migration.
 
 **Why this needs a design doc.** The README's loop is the product:
 crawl → score → work the queue → re-crawl until the verdict flips.
@@ -26,9 +27,9 @@ judgment and CMS access live, and hiding it behind `--fix-all` would
 produce unverified edits.
 
 ```
-seo-geo-run --profile site.yaml [--local] [--enrich pagespeed,gsc] --date YYYY-MM-DD
+seo-geo-run --profile site.yaml [--local] [--from-crawl PATH] [--enrich pagespeed,gsc] --date YYYY-MM-DD
         │
-        ├─ crawl  → audits/data/site-crawl-<date>.json
+        ├─ crawl (or copy --from-crawl) → audits/data/site-crawl-<date>.json
         ├─ enrich (optional)
         ├─ report → audits/standard-report-<date>.md
         │           audits/data/standard-report-<date>.json
@@ -175,7 +176,10 @@ per-ID checks. The Skill should say so.
 - Phase 1 can ship `plan-sync`, `update_status` CLI, and
   `seo-geo-remediate --id` without `seo-geo-run` or `seo-geo-verify`.
   The Skill can still list the long form.
-- Phase 4 adds `seo-geo-run` and `seo-geo-verify` once a real profile
-  exists to try them on.
+- Phase 4 shipped `seo-geo-run` and `seo-geo-verify` against the sample
+  profile (`--from-crawl` covers the no-Playwright path). A real-site
+  verified flip still waits on Phase 3's live migration.
 - `seo-geo-run` is a Python function that calls the existing `main()`s
-  with argv, not a rewrite of crawl/report.
+  with argv, not a rewrite of crawl/report. `--from-crawl` copies an
+  existing site-crawl JSON into the dated snapshot so scoring a fixture
+  (or re-scoring without a new browser crawl) uses the same pipeline.
