@@ -1,0 +1,31 @@
+{
+  "id": "https://example.com/",
+  "captchaResult": "CAPTCHA_NOT_NEEDED",
+  "kind": "pagespeedonline#result",
+  "lighthouseResult": {
+    "requestedUrl": "https://example.com/",
+    "finalUrl": "https://example.com/",
+    "configSettings": {
+      "emulatedFormFactor": "mobile",
+      "formFactor": "mobile"
+    },
+    "audits": {
+      "largest-contentful-paint": {
+        "id": "largest-contentful-paint",
+        "title": "Largest Contentful Paint",
+        "numericValue": 1800,
+        "numericUnit": "millisecond",
+        "displayValue": "1.8 s"
+      },
+      "experimental-interaction-to-next-paint": {
+        "id": "experimental-interaction-to-next-paint",
+        "title": "Interaction to Next Paint",
+        "numericValue": 188,
+        "numericUnit": "millisecond"
+      }
+    }
+  },
+  "loadingExperience": {
+    "initial_url": "https://example.com/"
+  }
+}

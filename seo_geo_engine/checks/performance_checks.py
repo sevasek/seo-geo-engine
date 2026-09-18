@@ -1,5 +1,9 @@
-from seo_geo_engine.checks.framework import check, passed, failed, blocked
+from seo_geo_engine.checks.framework import CheckResult, check, passed, failed, blocked
 from seo_geo_engine.checks.helpers import pages
+
+_PSI_ENRICHMENT_DETAIL = (
+    "Needs PageSpeed Insights enrichment — see docs/design/enrichment.md"
+)
 
 MAX_BYTES = 250_000
 
@@ -46,7 +50,7 @@ def check_lcp(site: dict):
     """Largest Contentful Paint, from PageSpeed Insights lab data."""
     assessable = [p for p in pages(site) if p.get("pageSpeed") and p["pageSpeed"].get("lcpMs") is not None]
     if not assessable:
-        return blocked("PERF-002")
+        return CheckResult(id="PERF-002", verdict="blocked", detail=_PSI_ENRICHMENT_DETAIL)
     caveat = _field_data_caveat(assessable)
     offenders = [
         f"{p['url']} — LCP {p['pageSpeed']['lcpMs'] / 1000:.2f}s (Good is <=2.5s)"
@@ -69,7 +73,7 @@ def check_cls(site: dict):
     """Cumulative Layout Shift, from PageSpeed Insights lab data."""
     assessable = [p for p in pages(site) if p.get("pageSpeed") and p["pageSpeed"].get("cls") is not None]
     if not assessable:
-        return blocked("PERF-003")
+        return CheckResult(id="PERF-003", verdict="blocked", detail=_PSI_ENRICHMENT_DETAIL)
     caveat = _field_data_caveat(assessable)
     offenders = [
         f"{p['url']} — CLS {p['pageSpeed']['cls']} (Good is <=0.1)"

@@ -1,7 +1,7 @@
 # Design: blocked rules and GEO depth
 
-**Status:** proposed (accepted as policy in Phase 2; work that
-unblocks a row is Phase 5 unless a profile map is trivial).
+**Status:** accepted (Phase 2). Work that unblocks a Kind A/C row is
+Phase 5 unless a profile map is trivial.
 
 **Why this needs a design doc.** Nine default rows are `status:
 blocked` with a one-line `@check` stub. They still carry weight, so

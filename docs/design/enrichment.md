@@ -1,8 +1,7 @@
 # Design: enrichment (PageSpeed Insights, Search Console)
 
-**Status:** proposed (Phase 2). Checks already consume the keys; no
-producer exists. The Skill currently points at "the engine's own
-docs for the enrichment script contracts" — this is that contract.
+**Status:** accepted / implemented (Phase 2). `seo-geo-enrich` is the
+producer; checks already consumed the keys.
 
 **Why this needs a design doc.** Three default rows are `status:
 open` with real logic, but they return `blocked` unless extra blobs
@@ -203,15 +202,13 @@ already says so.
 
 ## Implementation notes
 
-- New optional extra: `enrich = ["google-api-python-client", ...]`
-  (pin versions when writing the code). Keep `[mcp]` as-is.
+- Optional extra (pinned): `enrich = ["google-api-python-client>=2.160.0,<3",
+  "google-auth>=2.35.0,<3", "google-auth-httplib2>=0.2.0,<1"]`. Keep
+  `[mcp]` as-is. Base `pip install` does not pull Google libs.
 - Tests: recorded API payloads under `tests/fixtures/enrichment/`,
-  merge function unit-tested, no live network in fast tests.
-- Sample profile: stop embedding `pageSpeed` in the *committed*
-  crawl fixture if we want the fixture to represent a raw crawl —
-  *or* keep it and add a second `site-crawl-unenriched.json`.
-  Recommended: keep the enriched sample as the scoring fixture (so
-  sample scores stay stable) and add an unenriched variant for
-  "runtime blocked" tests.
-- Rate limits: document that a 50-page site is ~50 PSI calls. Don't
-  parallelize in v1.
+  merge function unit-tested, urllib mocked, no live network in fast
+  tests. Sample scores stay on the enriched crawl fixture; the
+  unenriched variant is
+  `tests/fixtures/enrichment/site-crawl-unenriched.json`.
+- Rate limits: a 50-page site is ~50 PSI calls, sequential, with a
+  1s delay. Don't parallelize in v1.

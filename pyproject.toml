@@ -16,6 +16,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=9", "jsonschema>=4"]
 mcp = ["mcp>=1.0"]
+enrich = [
+    "google-api-python-client>=2.160.0,<3",
+    "google-auth>=2.35.0,<3",
+    "google-auth-httplib2>=0.2.0,<1",
+]
 
 [project.scripts]
 seo-geo-report = "seo_geo_engine.report:main"
@@ -24,6 +29,7 @@ seo-geo-plan-sync = "seo_geo_engine.remediation.plan_sync:main"
 seo-geo-update-status = "seo_geo_engine.remediation.remediation_loader:main"
 seo-geo-crawl = "seo_geo_engine.crawl.run:main"
 seo-geo-init-profile = "seo_geo_engine.scaffold.init_profile:main"
+seo-geo-enrich = "seo_geo_engine.enrichment.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["seo_geo_engine*"]

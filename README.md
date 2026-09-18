@@ -149,8 +149,7 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       uses — verified same output shape, confirmed port teardown.
 - [x] Skill template + `seo-geo-init-profile` scaffold command — a
       brand-new profile passes its own generated test with zero
-      hand-written logic beyond `site.yaml`. Fast pytest (including the
-      new plan-sync / schema / scaffold coverage) plus 16 JS crawler
+      hand-written logic beyond `site.yaml`. Fast pytest plus 16 JS crawler
       unit tests; slow Playwright tests on main.
 - [x] Engine-owned remediations for every default standard ID (generic
       playbooks + SCHEMA-001 / OG-002 script handlers), `seo-geo-plan-sync`
@@ -159,6 +158,11 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       JSON Schema, and GitHub Actions CI. A new profile can be crawled,
       scored, queued, and worked without copying engine code. See
       [docs/PLAN.md](docs/PLAN.md).
+- [x] Enrichment: `seo-geo-enrich` post-crawl merge of PageSpeed Insights
+      (mobile lab LCP/CLS) and Search Console sitemap status. GSC client
+      libs are `pip install seo-geo-engine[enrich]`; credentials stay in
+      the environment. See
+      [docs/design/enrichment.md](docs/design/enrichment.md).
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
       above to work today. See [docs/design/mcp.md](docs/design/mcp.md).
