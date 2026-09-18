@@ -406,6 +406,7 @@ def test_unenriched_runtime_blocks_open_rules():
     assert gsc.verdict == "blocked"
     assert "docs/design/enrichment.md" in lcp.detail
     assert "docs/design/enrichment.md" in cls.detail
+    assert "docs/design/enrichment.md" in gsc.detail
     assert check_inp(site).verdict == "blocked"
 
 

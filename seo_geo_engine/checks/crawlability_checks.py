@@ -1,7 +1,7 @@
 import re
 from urllib.parse import urlparse
 
-from seo_geo_engine.checks.framework import check, passed, failed, blocked
+from seo_geo_engine.checks.framework import CheckResult, check, passed, failed, blocked
 
 # Known AI crawler user-agents worth checking robots.txt against — see the
 # GEO framework's "make the site accessible to AI crawlers" idea.
@@ -315,7 +315,11 @@ def check_sitemap_submitted_to_gsc(site: dict):
     vacuous pass."""
     gsc = site.get("searchConsole")
     if not gsc:
-        return blocked("CRAWL-008")
+        return CheckResult(
+            id="CRAWL-008",
+            verdict="blocked",
+            detail="Needs Search Console enrichment — see docs/design/enrichment.md",
+        )
     if not gsc.get("sitemapSubmitted"):
         return failed("CRAWL-008", "No sitemap has been submitted to Google Search Console.", [], fraction=0.0)
     errors = gsc.get("sitemapErrors", 0)
