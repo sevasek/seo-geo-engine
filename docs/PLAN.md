@@ -117,9 +117,10 @@ See [design/engine-owned-remediation.md](design/engine-owned-remediation.md).
 
 The Skill tells an agent which commands to run. `seo-geo-run` is the
 gather-and-score orchestrator; `seo-geo-verify` diffs two dated JSON
-reports (`--id`, `--require-not-worse`). See
+reports (`--id`, `--require-not-worse`). Enrichment is also available
+standalone as `seo-geo-enrich`. See
 [design/agent-loop.md](design/agent-loop.md). A verified flip on a
-*real* migrated profile is still Phase 3 then the rest of Phase 4.
+*real* migrated profile is still the rest of Phase 4, after Phase 3.
 
 ### Tests
 
@@ -156,13 +157,15 @@ run a real crawl.
 - Migration of `auto-ps-seo-audit` and `sevasek-com-seo-audit` — they
   still run forked copies. See
   [design/profile-migration.md](design/profile-migration.md).
-- An engine versioning / compatibility policy. Not decided until this
-  doc set. See [design/versioning.md](design/versioning.md).
+- `1.0.0` — a Phase 3 *exit* after a real profile has migrated. The
+  0.x compatibility policy itself is shipped: see
+  [design/versioning.md](design/versioning.md) and `CHANGELOG.md`.
 
 ### Honest gaps that the README doesn't spell out
 
 These are the reasons you cannot yet point this at a third site and
-walk away (Phase 1 closed the operable-queue gaps):
+walk away (Phase 1–2 closed the operable-queue and enrichment-producer
+gaps; engine-side Phase 4 commands are shipped):
 
 | Gap | Why it still blocks the loop |
 |---|---|
@@ -255,32 +258,42 @@ reliable automated signal *exists* — it just isn't the crawler. Until
 something writes `pageSpeed` / `searchConsole` onto the site dict, they
 runtime-block and occupy score weight as a hole.
 
-**Shipped:** `seo-geo-enrich` as specified in
-[design/enrichment.md](design/enrichment.md). Credentials stay in the
-environment, never in the engine. The crawler stays auth-free.
-[design/blocked-rules.md](design/blocked-rules.md) is accepted policy.
+**Build (what landed):** the post-crawl enricher specified in
+[design/enrichment.md](design/enrichment.md) — `seo-geo-enrich`
+`--pagespeed` / `--gsc` (also `seo-geo-run --enrich`), optional
+`[enrich]` extra for GSC client libs. Credentials stay in the
+environment (or an env-var *name* in the profile), never in the
+engine. The crawler stays auth-free.
 
-**Exit criterion (met on fixtures):** the sample profile's
-`pageSpeed` blocks can be reproduced by the enricher against a mocked
-API. PERF-002 on a public URL, given a key, returns pass/fail rather
-than blocked. Live Google is not in the fast suite.
+Also in this phase: the three kinds of "blocked" (no signal / missing
+enrichment / needs a profile map) in
+[design/blocked-rules.md](design/blocked-rules.md), treated as
+accepted.
 
-### Phase 3 — versioning, then one real migration
+**Exit criterion (met):** the sample profile's hand-written
+`pageSpeed` blocks are reproduced by the enricher against a recorded
+PSI fixture (mocked API, no live Google). `--pagespeed` against
+localhost / `.test` is refused. PERF-002 on a public URL, given a
+key (tests mock HTTP), returns pass/fail rather than blocked.
 
-Do not migrate a living audit onto this package without a pin story.
-[design/versioning.md](design/versioning.md) is the decision; this
-phase implements it:
+### Phase 3 — versioning (policy shipped), then one real migration
 
-- Declare 0.x semver rules in the README / CHANGELOG.
-- CHANGELOG records standard IDs added, removed, or reweighted.
-- Sample profile is the compatibility canary: it must stay green
-  against the engine version it claims.
+The pin story is in place so a living audit can depend on this
+package instead of forking it:
 
-Then migrate **one** of the two forked repos — whichever is smaller
-or more typical; the design doc's recommendation is `auto-ps-seo-audit`
-first only if its extra surface area is smaller in practice, otherwise
-pick the one whose `checks_ext.py` is the cleaner split. The procedure
-is [design/profile-migration.md](design/profile-migration.md). Do not
+- 0.x is treated like 1.x for compatibility. Profiles pin
+  `seo-geo-engine>=0.1,<0.2`.
+- `CHANGELOG.md` records standard IDs added, removed, or reweighted,
+  crawl-contract field changes, and profile migration notes.
+- `examples/sample-profile/` is the 0.1.x compatibility canary.
+- Policy: [design/versioning.md](design/versioning.md) (accepted).
+
+**What remains:** migrate **one** of the two forked repos — whichever
+is smaller or more typical; the design doc's recommendation is
+`auto-ps-seo-audit` first only if its extra surface area is smaller
+in practice, otherwise pick the one whose `checks_ext.py` is the
+cleaner split. The procedure is
+[design/profile-migration.md](design/profile-migration.md). Do not
 migrate both in parallel: the first migration is how we find out
 whether the engine/profile split actually holds.
 

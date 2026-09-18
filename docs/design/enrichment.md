@@ -211,4 +211,6 @@ already says so.
   unenriched variant is
   `tests/fixtures/enrichment/site-crawl-unenriched.json`.
 - Rate limits: a 50-page site is ~50 PSI calls, sequential, with a
-  1s delay. Don't parallelize in v1.
+  1s delay. Don't parallelize in v1. A mixed crawl that includes any
+  localhost / `.test` / private IP is refused for `--pagespeed` as a
+  whole (not partially enriched).

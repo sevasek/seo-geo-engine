@@ -55,7 +55,11 @@ contact-info patterns, extra standard rows — lives in a **profile** (a
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest                                    # engine's own test suite
+pytest                                    # engine's own test suite (fast tests only)
+
+# Only needed for an actual crawl (live URL or --local) — scoring an
+# already-captured crawl JSON, like the quickstart below, doesn't need this:
+(cd seo_geo_engine/crawler && npm install && npx playwright install chromium)
 
 # Score the synthetic "Acme Example Co" sample profile against the engine
 cp examples/sample-profile/remediation-plan.md /tmp/acme-plan.md
@@ -79,15 +83,15 @@ seo-geo-remediate \
 seo-geo-verify \
     --before /tmp/acme-audit/data/standard-report-2026-09-10.json \
     --after  /tmp/acme-audit/data/standard-report-2026-09-10.json \
+    --id SCHEMA-001 \
     --require-not-worse
 ```
 
-A live or local-serve crawl needs Playwright Chromium in
-`seo_geo_engine/crawler/` (`npm install` and `npx playwright install chromium`).
-`pip install -e ".[dev]"` is enough for scoring and the fast test suite, not
-for a real-browser crawl. Engineering decisions for the remaining loop live in
+Engineering decisions for the remaining loop live in
 [`docs/SYSTEM.md`](docs/SYSTEM.md) (map) and [`docs/PLAN.md`](docs/PLAN.md)
-(schedule).
+(schedule). Optional post-crawl enrichment (`seo-geo-enrich` or
+`seo-geo-run --enrich pagespeed,gsc`) is documented in
+[`docs/design/enrichment.md`](docs/design/enrichment.md).
 
 The HTML dashboard is a plain, deterministic static file — open it directly,
 serve it with `python3 -m http.server`, or push it to any static host.
@@ -126,6 +130,7 @@ seo_geo_engine/            — the installable package
   remediation/                — remediation-tracking layer (mirrors checks/)
   crawl/                      — crawler CLI + local-serve-and-crawl mode
   crawler/                    — the packaged Playwright crawler (crawl.js)
+  enrichment/                 — post-crawl PageSpeed Insights / Search Console merge
   testing/                    — reusable pytest assertions a profile can import
   standard/default/           — the engine's shipped, non-business-specific rule set
   skills/, routines/           — Skill/governance-routine templates a profile scaffolds
@@ -153,8 +158,9 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       uses — verified same output shape, confirmed port teardown.
 - [x] Skill template + `seo-geo-init-profile` scaffold command — a
       brand-new profile passes its own generated test with zero
-      hand-written logic beyond `site.yaml`. Fast pytest plus 16 JS crawler
-      unit tests; slow Playwright tests on main.
+      hand-written logic beyond `site.yaml`. Fast pytest (including the
+      new plan-sync / schema / scaffold / enrichment / agent-loop coverage)
+      plus 16 JS crawler unit tests; slow Playwright tests on main.
 - [x] Engine-owned remediations for every default standard ID (generic
       playbooks + SCHEMA-001 / OG-002 script handlers), `seo-geo-plan-sync`
       to bootstrap/prune `remediation-plan.md`, `seo-geo-remediate --id` to
@@ -171,7 +177,7 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       (crawl → optional enrich → report → plan-sync → queue → HTML);
       `seo-geo-verify` diffs two report JSONs (`--id`, `--require-not-worse`).
       The Skill template sequences those commands. Proven against the
-      sample profile; a real-site verified flip still waits on Phase 3
+      sample profile; a real-site verified flip still waits on a live
       migration. See [docs/design/agent-loop.md](docs/design/agent-loop.md).
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
@@ -183,8 +189,31 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       `remediation-plan.md`/`playbooks/`). See
       [docs/design/profile-migration.md](docs/design/profile-migration.md).
 - [ ] Same migration for `sevasek-com-seo-audit`.
-- [ ] An engine versioning/compatibility policy for those two migrations
-      (semver, how a breaking rule-schema change reaches a profile pinned
-      to an older tag) — decided in
-      [docs/design/versioning.md](docs/design/versioning.md); not implemented
-      until Phase 3.
+- [x] Engine versioning/compatibility policy — 0.x is treated like 1.x
+      for compatibility; profiles pin `seo-geo-engine>=0.1,<0.2`; the
+      public API is crawl JSON + check ID semantics + `@check`/
+      `@remediate` signatures. See
+      [docs/design/versioning.md](docs/design/versioning.md) and
+      [CHANGELOG.md](CHANGELOG.md). Not on PyPI; `1.0.0` waits on a
+      real profile migration.
+
+## Versioning
+
+Package version is **0.1.0**. During 0.x we treat compatibility like
+1.x: do not casually break profiles. Profiles pin
+
+```
+seo-geo-engine>=0.1,<0.2
+```
+
+The public API is the crawl JSON, check ID semantics, and the
+`@check` / `@remediate` function signatures — not only the Python
+modules. Every release's `CHANGELOG.md` entry lists standard IDs
+added, removed, or reweighted; crawl-contract field changes; and
+profile migration notes. `examples/sample-profile/` is the 0.1.x
+compatibility canary (`pytest` in this repo runs it).
+
+This package is not published to PyPI yet (editable install + git tag
+is enough until a real profile wants a non-editable pin). `1.0.0` is a
+Phase 3 exit after a real audit has migrated, not this release. Full
+policy: [docs/design/versioning.md](docs/design/versioning.md).

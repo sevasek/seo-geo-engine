@@ -1,7 +1,9 @@
 # Design: engine versioning and profile compatibility
 
-**Status:** proposed (Phase 3, before any live migration). The README
-names this as undecided. Package version is currently `0.1.0`.
+**Status:** accepted (policy). Package version is `0.1.0`. Tags and
+GitHub releases are cut as we ship versions; nothing is published to
+PyPI until a real profile wants a non-editable install. `1.0.0` remains
+a Phase 3 *exit* after a real profile has migrated.
 
 **Why this needs a design doc.** A profile is supposed to *depend on*
 this package, not fork it. The moment `auto-ps-seo-audit` pins
@@ -21,10 +23,12 @@ like 1.x for compatibility, and ship `1.0.0` at the end of Phase 3
 once one real profile is on the engine and the contract has been
 wrong once in production.
 
-Profiles pin:
+Profiles pin the current 0.x minor so they take PATCH fixes without
+automatically picking up new standard IDs from the next MINOR:
 
 ```
-seo-geo-engine>=0.2,<0.3    # while we are on 0.x, after this policy lands
+seo-geo-engine>=0.1,<0.2    # current 0.1.x
+seo-geo-engine>=0.2,<0.3    # after a 0.2 MINOR (same 0.x pattern)
 seo-geo-engine>=1.0,<2.0    # after 1.0
 ```
 
@@ -132,10 +136,11 @@ a site disagrees with a default.
 
 ## Implementation notes
 
-- Add CHANGELOG.md in the same PR that adopts this policy (Phase 3
-  start), even if the only entry is "0.1.0: initial extract."
-- README Status's "not decided yet" line becomes a pointer here.
-- Tag releases (`v0.2.0`). Don't publish to PyPI until at least one
-  real profile wants a non-editable install; editable + git tag is
-  enough for the first migration.
-- 1.0.0 is a Phase 3 *exit* decision, not a Phase 1 task.
+- `CHANGELOG.md` ships with this policy (Phase 3 start); the first
+  entry is 0.1.0, the initial extract.
+- README Status points here; 0.x pin is `seo-geo-engine>=0.1,<0.2`.
+- Tag releases (`v0.1.0`, then `v0.2.0`, …) as we cut versions. Don't
+  publish to PyPI until at least one real profile wants a non-editable
+  install; editable + git tag is enough for the first migration.
+- 1.0.0 is a Phase 3 *exit* decision, not a version bump in the
+  policy PR.

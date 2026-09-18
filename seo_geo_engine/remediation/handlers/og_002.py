@@ -1,4 +1,6 @@
 """OG-002 — reuse metaDesc as og:description. Never invent copy."""
+import html
+
 from seo_geo_engine.checks.helpers import pages
 from seo_geo_engine.remediation.remediation_framework import RemediationResult, remediate
 
@@ -19,7 +21,10 @@ def remediate_og_002(site: dict) -> RemediationResult:
     for p in targets:
         fallback = (p.get("metaDesc") or "").strip()
         if fallback:
-            lines.append(f'{p["url"]}\n<meta property="og:description" content="{fallback}">')
+            lines.append(
+                f'{p["url"]}\n<meta property="og:description" '
+                f'content="{html.escape(fallback, quote=True)}">'
+            )
         else:
             lines.append(
                 f"{p['url']} — no meta description to reuse either; "

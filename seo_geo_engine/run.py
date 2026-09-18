@@ -153,15 +153,19 @@ def run(argv: list[str] | None = None, *, stdout=None, stderr=None) -> int:
             str(out_dir),
         ]
     )
-    plan_sync_main(
-        [
-            str(crawl_path),
-            "--profile",
-            str(profile_path),
-            "--plan",
-            str(plan_path),
-        ]
-    )
+    try:
+        plan_sync_main(
+            [
+                str(crawl_path),
+                "--profile",
+                str(profile_path),
+                "--plan",
+                str(plan_path),
+            ]
+        )
+    except FileNotFoundError as exc:
+        print(f"seo-geo-run: {exc}", file=err)
+        return 2
     queue_main(
         [
             str(crawl_path),
