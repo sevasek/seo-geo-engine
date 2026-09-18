@@ -12,6 +12,7 @@ from seo_geo_engine.remediation.remediation_framework import manual
 
 for _id, _depends_on in (
     ("LOCAL-001", "CMS-ACCESS"),
+    ("TRUST-001", "CMS-ACCESS"),
     ("LINK-001", "CMS-ACCESS"),
     ("LINK-002", "KEYWORD-MAP"),
 ):

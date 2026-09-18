@@ -45,7 +45,8 @@ def _split_preamble_and_table(text: str) -> tuple[str, str]:
     lines = text.splitlines()
     header_idx = None
     for i, line in enumerate(lines):
-        if line.strip().startswith("|") and "id" in line.lower():
+        lowered = line.strip().lower()
+        if lowered.startswith("|") and "id" in lowered and "approach" in lowered:
             header_idx = i
             break
     if header_idx is None:
