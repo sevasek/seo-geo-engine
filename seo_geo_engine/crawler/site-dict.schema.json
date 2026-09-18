@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sevasek/seo-geo-engine/crawler/site-dict.schema.json",
+  "title": "seo-geo-engine site dict",
+  "description": "The one interface between gather and score. Layer 1 fixtures may omit crawler-only keys; a live crawler snapshot should also satisfy $defs/crawlerSnapshot. additionalProperties is true so a profile check can read extra keys without a schema change. See docs/design/data-contract.md.",
+  "type": "object",
+  "required": ["pages"],
+  "additionalProperties": true,
+  "properties": {
+    "pages": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/page" }
+    },
+    "sitemapUrls": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "robotsTxt": { "type": "string" },
+    "discoveredNonSitemapPages": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/resolution" }
+    },
+    "linkResolutions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/resolution" }
+    },
+    "externalPresence": {
+      "type": ["object", "null"]
+    },
+    "searchConsole": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/searchConsole" }
+      ]
+    },
+    "profile": { "type": "object" }
+  },
+  "$defs": {
+    "page": {
+      "type": "object",
+      "required": ["url"],
+      "additionalProperties": true,
+      "properties": {
+        "url": { "type": "string" },
+        "status": { "type": ["integer", "null"] },
+        "title": { "type": "string" },
+        "titleLen": { "type": "integer" },
+        "metaDesc": { "type": "string" },
+        "metaDescLen": { "type": "integer" },
+        "canonical": { "type": ["string", "null"] },
+        "dupOgTags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "ogDescription": { "type": "string" },
+        "jsonLdTypes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "organizationNode": { "type": ["object", "null"] },
+        "dateModified": { "type": ["string", "null"] },
+        "h1Count": { "type": "integer" },
+        "h1s": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "h2Count": { "type": "integer" },
+        "h3Count": { "type": "integer" },
+        "headingSequence": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "imageCount": { "type": "integer" },
+        "imagesMissingAlt": { "type": "integer" },
+        "wordCount": { "type": "integer" },
+        "pTagWordCount": { "type": "integer" },
+        "bodyText": { "type": "string" },
+        "viewport": { "type": "string" },
+        "generator": { "type": "string" },
+        "hasAnalytics": { "type": "boolean" },
+        "bytes": { "type": ["integer", "null"] },
+        "noJsWordCount": { "type": ["integer", "null"] },
+        "internalHrefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "contentInternalHrefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "anchorTexts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "iframes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "extractError": { "type": "string" },
+        "pageSpeed": { "$ref": "#/$defs/pageSpeed" }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "required": ["url"],
+      "additionalProperties": true,
+      "properties": {
+        "url": { "type": "string" },
+        "status": { "type": ["integer", "null"] },
+        "redirected": { "type": "boolean" },
+        "finalUrl": { "type": ["string", "null"] },
+        "noindex": { "type": "boolean" },
+        "redirectStatus": { "type": ["integer", "null"] },
+        "redirectHops": { "type": "integer" }
+      }
+    },
+    "pageSpeed": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "lcpMs": { "type": "number" },
+        "cls": { "type": "number" },
+        "hasFieldData": { "type": "boolean" }
+      }
+    },
+    "searchConsole": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "sitemapSubmitted": { "type": "boolean" },
+        "sitemapErrors": { "type": "integer" },
+        "sitemapWarnings": { "type": "integer" }
+      }
+    },
+    "crawlerSnapshot": {
+      "description": "Keys the packaged crawler always writes. Used by tests against live crawl output and the sample fixture.",
+      "type": "object",
+      "required": [
+        "sitemapUrls",
+        "robotsTxt",
+        "pages",
+        "discoveredNonSitemapPages",
+        "linkResolutions"
+      ],
+      "allOf": [{ "$ref": "#" }]
+    }
+  }
+}

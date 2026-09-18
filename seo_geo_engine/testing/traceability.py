@@ -19,8 +19,12 @@ Usage (from a profile's own tests/test_traceability.py):
 from pathlib import Path
 
 import seo_geo_engine.checks  # noqa: F401  (triggers built-in check registration)
+import seo_geo_engine.remediation  # noqa: F401
 from seo_geo_engine.checks.framework import REGISTRY
 from seo_geo_engine.checks.standard_loader import load_standard_by_id
+from seo_geo_engine.paths import default_standard_paths
+from seo_geo_engine.remediation.remediation_framework import REGISTRY as REMEDIATION_REGISTRY
+from seo_geo_engine.remediation.remediation_framework import playbook_path
 
 
 def assert_standard_has_full_check_coverage(paths: list[Path]) -> None:
@@ -53,3 +57,30 @@ def assert_every_weight_in_range(paths: list[Path], min_weight: int = 1, max_wei
     by_id = load_standard_by_id(paths)
     bad = {i: item.weight for i, item in by_id.items() if not (min_weight <= item.weight <= max_weight)}
     assert not bad, f"Standard rows with an out-of-range weight: {bad}"
+
+
+def assert_engine_defaults_have_remediations() -> None:
+    """Every shipped default standard ID has an engine-owned remediation
+    (script or manual). Manual playbook files must exist. Engine remediations
+    must not claim IDs that aren't in the default standard — those belong in
+    a profile. See docs/design/engine-owned-remediation.md."""
+    by_id = load_standard_by_id(default_standard_paths())
+    engine_ids = {item_id for item_id, reg in REMEDIATION_REGISTRY.items() if reg.origin == "engine"}
+
+    missing = set(by_id) - engine_ids
+    assert not missing, (
+        f"These default standard rows have no engine-owned remediation: {sorted(missing)}. "
+        f"Add a @remediate / manual in seo_geo_engine.remediation.defaults."
+    )
+
+    orphans = engine_ids - set(by_id)
+    assert not orphans, (
+        f"Engine remediations for IDs that are not default standard rows: {sorted(orphans)}. "
+        f"Profile-only IDs belong in a profile's handlers.py."
+    )
+
+    for item_id, registered in REMEDIATION_REGISTRY.items():
+        if registered.origin != "engine" or registered.kind != "manual":
+            continue
+        path = playbook_path(registered)
+        assert path.is_file(), f"{item_id}: engine manual playbook missing at {path}"

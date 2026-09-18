@@ -31,3 +31,11 @@ def routine_template_dir() -> Path:
 
 def report_template_path() -> Path:
     return _package_dir() / "report_template.html"
+
+
+def engine_playbooks_dir() -> Path:
+    return _package_dir() / "remediation" / "playbooks"
+
+
+def site_dict_schema_path() -> Path:
+    return _package_dir() / "crawler" / "site-dict.schema.json"

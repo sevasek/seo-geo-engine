@@ -86,23 +86,30 @@ in site.yaml.
 
 HANDLERS_TEMPLATE = '''\
 """
-{org_name}'s own remediation handlers — one @remediate(id, kind=...) or
-manual(id, playbook=...) per non-passing row in remediation-plan.md.
+{org_name}'s own remediation handlers.
+
+Engine defaults already cover every shipped standard ID. Add entries here
+only for rows in standard/extensions.md, or to override an engine playbook
+/ script with a CMS-specific one (same ID, origin=profile).
 Imported by seo_geo_engine.profile.import_profile_code() via
 `handlers_module` in site.yaml.
 """
 # from seo_geo_engine.remediation.remediation_framework import RemediationResult, manual, remediate
 #
-# @remediate("CATEGORY-001", kind="script")
-# def remediate_category_001(site: dict) -> RemediationResult:
+# manual("CATEGORY-001", playbook="playbooks/CATEGORY-001.md", depends_on="CMS-ACCESS")
+#
+# @remediate("CATEGORY-002", kind="script")
+# def remediate_category_002(site: dict) -> RemediationResult:
 #     ...
 '''
 
 REMEDIATION_PLAN_TEMPLATE = """\
 # {org_name} — Remediation Plan
 
-One row per currently non-passing standard item — see seo-geo-engine's own
-README for the full contract. Empty until the first audit runs.
+One row per currently non-passing standard item. Empty until the first
+audit. After a crawl, run `seo-geo-plan-sync` to fill this table; use
+`seo-geo-update-status` to change Status/Notes. Do not add or delete rows
+by hand.
 
 | ID | Approach | Depends on | Status | Notes |
 |---|---|---|---|---|
@@ -128,15 +135,26 @@ def test_full_check_coverage():
 README_TEMPLATE = """\
 # {org_name} — SEO/GEO profile
 
-A profile for [seo-geo-engine](https://github.com/) — see that repo's own
-README for the full engine documentation. This directory holds only what's
-specific to {org_name}: `site.yaml`, `standard/extensions.md`,
-`checks_ext.py`, `handlers.py`, `remediation-plan.md`, `playbooks/`.
+A profile for [seo-geo-engine](https://github.com/sevasek/seo-geo-engine) —
+see that repo's own README and `docs/PLAN.md` for the full engine
+documentation. This directory holds only what's specific to {org_name}:
+`site.yaml`, `standard/extensions.md`, `checks_ext.py`, `handlers.py`,
+`remediation-plan.md`, `playbooks/` (overrides only — engine playbooks are
+the fallback).
 
 ```bash
 pip install seo-geo-engine  # or an editable local checkout during co-development
 python3 -m pytest
+
+# After a crawl:
+seo-geo-plan-sync audits/data/site-crawl-<date>.json --profile site.yaml
+seo-geo-report audits/data/site-crawl-<date>.json <date> "{org_name}" --profile site.yaml --out-dir audits
+seo-geo-remediate audits/data/site-crawl-<date>.json <date> --profile site.yaml --out-dir audits
 ```
+
+A real Playwright crawl also needs `npm install` and
+`npx playwright install chromium` in the engine's `seo_geo_engine/crawler/`
+directory. `pip install seo-geo-engine` is not enough for that step.
 
 See `.claude/skills/seo-geo-audit/SKILL.md` for the audit workflow.
 """

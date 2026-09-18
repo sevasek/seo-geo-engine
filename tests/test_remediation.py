@@ -7,6 +7,7 @@ from seo_geo_engine.paths import default_standard_paths
 from seo_geo_engine.profile import effective_standard, import_profile_code, load_profile
 from seo_geo_engine.remediation.plan import build_queue
 from seo_geo_engine.remediation.remediation_framework import REGISTRY as REMEDIATION_REGISTRY
+from seo_geo_engine.remediation.remediation_framework import playbook_path
 from seo_geo_engine.remediation.remediation_loader import load_remediation_plan_by_id, update_status
 from seo_geo_engine.report import run_report
 
@@ -55,21 +56,32 @@ def test_remediation_row_approach_matches_handler_kind(sample_profile):
 def test_manual_playbook_files_exist(sample_profile):
     plan_path = sample_profile.root / "remediation-plan.md"
     plan_by_id = load_remediation_plan_by_id(plan_path)
-    missing = [
-        item_id for item_id, row in plan_by_id.items()
-        if row.approach == "manual" and not (sample_profile.root / "playbooks" / f"{item_id}.md").exists()
-    ]
+    missing = []
+    for item_id, row in plan_by_id.items():
+        if row.approach != "manual":
+            continue
+        registered = REMEDIATION_REGISTRY.get(item_id)
+        assert registered is not None, f"{item_id}: no handler"
+        path = playbook_path(registered, profile_root=sample_profile.root)
+        if not path.is_file():
+            missing.append(f"{item_id} -> {path}")
     assert not missing, f"Manual remediation rows with no playbook file: {missing}"
 
 
 def test_script_handlers_produce_an_artifact(sample_profile, sample_crawl_path):
+    """A script handler pointed at a known-failing site must draft bytes.
+    Pointed at a site that already passes, empty artifact is allowed."""
+    items = effective_standard(sample_profile, default_standard_paths())
     site = json.loads(sample_crawl_path.read_text())
+    results = {item.id: result for item, result in run_report(site, items=items, profile=sample_profile)}
     site = {**site, "profile": sample_profile.to_dict()}
     for item_id, registered in REMEDIATION_REGISTRY.items():
         if registered.kind != "script":
             continue
         result = registered.fn(site)
-        assert result.artifact, f"{item_id}: a script handler produced no artifact"
+        verdict = results.get(item_id)
+        if verdict is not None and verdict.verdict != "pass":
+            assert result.artifact, f"{item_id}: a script handler produced no artifact for a non-passing site"
 
 
 def test_build_queue_ranks_by_points_lost(sample_profile, sample_crawl_path):

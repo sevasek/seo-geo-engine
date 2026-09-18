@@ -59,11 +59,35 @@ python3 -m seo_geo_engine.report \
     --profile examples/sample-profile/site.yaml \
     --out-dir /tmp/acme-audit
 
+cp examples/sample-profile/remediation-plan.md /tmp/acme-audit/remediation-plan.md
+seo-geo-plan-sync \
+    examples/sample-profile/fixtures/site-crawl-sample.json \
+    --profile examples/sample-profile/site.yaml \
+    --plan /tmp/acme-audit/remediation-plan.md
+
+python3 -m seo_geo_engine.remediation.plan \
+    examples/sample-profile/fixtures/site-crawl-sample.json \
+    2026-09-10 \
+    --profile examples/sample-profile/site.yaml \
+    --plan /tmp/acme-audit/remediation-plan.md \
+    --out-dir /tmp/acme-audit
+
+# Draft a script artifact (does not publish):
+seo-geo-remediate \
+    examples/sample-profile/fixtures/site-crawl-sample.json \
+    2026-09-10 \
+    --profile examples/sample-profile/site.yaml \
+    --id SCHEMA-001 \
+    --out-dir /tmp/acme-audit
+
 python3 -m seo_geo_engine.render_html_report \
     /tmp/acme-audit/data/standard-report-2026-09-10.json \
     /tmp/acme-audit/standard-report-2026-09-10.html \
     --eyebrow "SEO / GEO Standard  ·  Acme Example Co" --title "SEO Scorecard"
 ```
+
+Engineering decisions for the remaining loop live in
+[`docs/PLAN.md`](docs/PLAN.md).
 
 The HTML dashboard is a plain, deterministic static file — open it directly,
 serve it with `python3 -m http.server`, or push it to any static host.
@@ -103,6 +127,7 @@ seo_geo_engine/            — the installable package
   standard/default/           — the engine's shipped, non-business-specific rule set
   skills/, routines/           — Skill/governance-routine templates a profile scaffolds
   scaffold/                    — `seo-geo-init-profile` — scaffold a new profile
+docs/                         — PLAN.md + design docs for the remaining loop
 tests/                        — the engine's own test suite (fixtures + traceability)
 examples/sample-profile/       — synthetic worked example, not a real dependent
 ```
@@ -125,17 +150,28 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       uses — verified same output shape, confirmed port teardown.
 - [x] Skill template + `seo-geo-init-profile` scaffold command — a
       brand-new profile passes its own generated test with zero
-      hand-written logic beyond `site.yaml`. 103/103 tests green
-      (85 fast + 2 slow Python, 16 JS) as of 2026-09-11.
+      hand-written logic beyond `site.yaml`. Fast pytest (including the
+      new plan-sync / schema / scaffold coverage) plus 16 JS crawler
+      unit tests; slow Playwright tests on main.
+- [x] Engine-owned remediations for every default standard ID (generic
+      playbooks + SCHEMA-001 / OG-002 script handlers), `seo-geo-plan-sync`
+      to bootstrap/prune `remediation-plan.md`, `seo-geo-remediate --id` to
+      run a script handler, `seo-geo-update-status` CLI, crawl site-dict
+      JSON Schema, and GitHub Actions CI. A new profile can be crawled,
+      scored, queued, and worked without copying engine code. See
+      [docs/PLAN.md](docs/PLAN.md).
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
-      above to work today.
+      above to work today. See [docs/design/mcp.md](docs/design/mcp.md).
 - [ ] Migrate `auto-ps-seo-audit` into a real profile depending on this
       engine (drop its own copy of `framework.py`/`standard_loader.py`/
       `report.py`/etc., keep only `site.yaml` + its business-specific
       `checks_ext.py`/`handlers.py`/`standard/extensions.md`/
-      `remediation-plan.md`/`playbooks/`).
+      `remediation-plan.md`/`playbooks/`). See
+      [docs/design/profile-migration.md](docs/design/profile-migration.md).
 - [ ] Same migration for `sevasek-com-seo-audit`.
 - [ ] An engine versioning/compatibility policy for those two migrations
       (semver, how a breaking rule-schema change reaches a profile pinned
-      to an older tag) — not decided yet.
+      to an older tag) — decided in
+      [docs/design/versioning.md](docs/design/versioning.md); not implemented
+      until Phase 3.
