@@ -1,0 +1,22 @@
+{
+  "sitemap": [
+    {
+      "path": "https://www.acme-example.test/sitemap.xml",
+      "lastSubmitted": "2026-09-01T00:00:00.000Z",
+      "isPending": false,
+      "isSitemapsIndex": false,
+      "type": "sitemap",
+      "warnings": "1",
+      "errors": "0"
+    },
+    {
+      "path": "https://www.acme-example.test/news-sitemap.xml",
+      "lastSubmitted": "2026-09-01T00:00:00.000Z",
+      "isPending": false,
+      "isSitemapsIndex": false,
+      "type": "sitemap",
+      "warnings": "9",
+      "errors": "4"
+    }
+  ]
+}

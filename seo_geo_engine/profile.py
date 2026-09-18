@@ -63,6 +63,10 @@ class SiteProfile:
 
     local_dev: dict = field(default_factory=dict)
 
+    # Post-crawl enrichment (PageSpeed Insights / Search Console). Holds
+    # the *names* of env vars and the GSC property URL — never the secrets.
+    enrichment: dict = field(default_factory=dict)
+
     disabled_ids: list[DisabledRule] = field(default_factory=list)
 
     standard_extension_paths: list[Path] = field(default_factory=list)
@@ -99,6 +103,7 @@ class SiteProfile:
                 "user_agent": self.user_agent,
             },
             "local_dev": self.local_dev,
+            "enrichment": self.enrichment,
         }
 
 
@@ -138,6 +143,7 @@ def load_profile(path: str | Path) -> SiteProfile:
         sitemap_url=crawl.get("sitemap_url", ""),
         user_agent=crawl.get("user_agent", ""),
         local_dev=data.get("local_dev", {}) or {},
+        enrichment=data.get("enrichment", {}) or {},
         disabled_ids=disabled,
         standard_extension_paths=ext_paths,
         checks_module=data.get("checks_module", ""),

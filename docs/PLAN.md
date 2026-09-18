@@ -79,7 +79,8 @@ localhost through the identical pipeline.
 The crawler does **not** fetch PageSpeed Insights, Search Console, or
 external-presence data. Those keys exist on the site dict
 (`pageSpeed`, `searchConsole`, `externalPresence`) and checks already
-read them — the scripts that fill them do not exist yet. See
+read them. `seo-geo-enrich` is the post-crawl merge that writes
+`pageSpeed` / `searchConsole`; `externalPresence` stays unused. See
 [design/enrichment.md](design/enrichment.md) and
 [design/data-contract.md](design/data-contract.md).
 
@@ -114,8 +115,8 @@ See [design/engine-owned-remediation.md](design/engine-owned-remediation.md).
 
 The Skill tells an agent which commands to run. It does not close the
 loop: there is no verify-the-flip command and no single orchestrator.
-Enrichment contracts now live in `docs/design/enrichment.md`; the
-scripts themselves do not exist yet.
+Enrichment is a separate command (`seo-geo-enrich`) after crawl; see
+[design/enrichment.md](design/enrichment.md).
 
 ### Tests
 
@@ -134,6 +135,7 @@ scripts themselves do not exist yet.
   engine manual has a playbook file).
 - `seo-geo-plan-sync`, `seo-geo-remediate --id`, `seo-geo-update-status`,
   and the scaffold's engine repo URL.
+- `seo-geo-enrich` against recorded PSI/GSC fixtures (no live Google).
 
 GitHub Actions runs fast `pytest` plus crawler unit tests on every PR;
 `pytest -m slow` (Playwright Chromium) on pushes to main. Default
@@ -155,11 +157,12 @@ run a real crawl.
 ### Honest gaps that the README doesn't spell out
 
 These are the reasons you cannot yet point this at a third site and
-walk away (Phase 1 closed the operable-queue gaps):
+walk away (Phase 1 closed the operable-queue gaps; Phase 2 closed the
+enrichment producer):
 
 | Gap | Why it still blocks the loop |
 |---|---|
-| Enrichment scripts missing | PERF-002, PERF-003, CRAWL-008 are `status: open` but return `blocked` on an un-enriched crawl. The sample fixture cheats by embedding `pageSpeed` by hand. Phase 2. |
+| Enrichment needs credentials | PERF-002, PERF-003, CRAWL-008 still runtime-block on a crawl-only JSON. `seo-geo-enrich` writes the blobs when keys are present. |
 | No verify-the-flip tool | Status can be set to `verified` without a re-crawl. The Skill says not to; the engine doesn't enforce it. Phase 4. |
 | Global `REGISTRY` | Importing two profiles in one process would collide on ID. Fine for CLI-per-profile; a future MCP/multi-site runner would not be. |
 | 9 blocked default rows | They occupy weight in the score with no path to earn it. A new site starts with a structural hole (CONTENT-004–008, LINK-006–008, PERF-004). |
@@ -241,30 +244,29 @@ Un-blocking it is Phase 2.
    fixture; remediations track *current* fails, not every ID in the
    abstract.
 
-### Phase 2 — enrichment so "open" rules can actually pass
+### Phase 2 — enrichment so "open" rules can actually pass (shipped)
 
 PERF-002, PERF-003, and CRAWL-008 are labeled `open` because a
 reliable automated signal *exists* — it just isn't the crawler. Until
 something writes `pageSpeed` / `searchConsole` onto the site dict, they
 runtime-block and occupy score weight as a hole.
 
-**Build:** the post-crawl enricher specified in
-[design/enrichment.md](design/enrichment.md). Credentials stay in the
-profile or the environment, never in the engine. The crawler stays
-auth-free.
+**Build (what landed):** the post-crawl enricher specified in
+[design/enrichment.md](design/enrichment.md) — `seo-geo-enrich`
+`--pagespeed` / `--gsc`, optional `[enrich]` extra for GSC client
+libs. Credentials stay in the environment (or an env-var *name* in
+the profile), never in the engine. The crawler stays auth-free.
 
-Also in this phase, not later: document the three kinds of "blocked"
-(no signal / missing enrichment / needs a profile map) so a future
-contributor doesn't "unblock" CONTENT-005 with a naive keyword
-counter. That's [design/blocked-rules.md](design/blocked-rules.md),
-which this phase should treat as accepted.
+Also in this phase: the three kinds of "blocked" (no signal / missing
+enrichment / needs a profile map) in
+[design/blocked-rules.md](design/blocked-rules.md), treated as
+accepted.
 
-**Exit criterion:** the sample profile's hand-written `pageSpeed`
-blocks can be reproduced by the enricher against a fixture (mocked
-API). A live crawl + enrich of the sample's local-site (PSI will
-fail against localhost — that's fine) still scores the crawl-only
-rules. PERF-002 on a public URL, given a key, returns pass/fail
-rather than blocked.
+**Exit criterion (met):** the sample profile's hand-written
+`pageSpeed` blocks are reproduced by the enricher against a recorded
+PSI fixture (mocked API, no live Google). `--pagespeed` against
+localhost / `.test` is refused. PERF-002 on a public URL, given a
+key (tests mock HTTP), returns pass/fail rather than blocked.
 
 ### Phase 3 — versioning, then one real migration
 

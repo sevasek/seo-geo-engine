@@ -1,0 +1,347 @@
+{
+  "sitemapUrls": [
+    "https://www.acme-example.test/",
+    "https://www.acme-example.test/services/",
+    "https://www.acme-example.test/services/widget-installation/",
+    "https://www.acme-example.test/services/widget-repair/",
+    "https://www.acme-example.test/about/",
+    "https://www.acme-example.test/contact/"
+  ],
+  "robotsTxt": "User-agent: *\nDisallow: /wp-admin/\n\nUser-agent: GPTBot\nDisallow: /wp-admin/\n",
+  "discoveredNonSitemapPages": [],
+  "linkResolutions": [
+    {
+      "url": "https://www.acme-example.test/",
+      "status": 200,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/services/",
+      "status": 200,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-installation/",
+      "status": 200,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-repair/",
+      "status": 200,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-consulting/",
+      "status": 200,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/about/",
+      "status": 200,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/contact/",
+      "status": 200,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-warranty/",
+      "status": 404,
+      "redirected": false
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-instalation/",
+      "status": 301,
+      "redirected": true,
+      "finalUrl": "https://www.acme-example.test/services/widget-installation/",
+      "redirectStatus": 301,
+      "redirectHops": 1
+    }
+  ],
+  "searchConsole": null,
+  "pages": [
+    {
+      "url": "https://www.acme-example.test/",
+      "title": "Acme Example Co | Widget Installation, Repair & Consulting",
+      "titleLen": 55,
+      "metaDesc": "Acme Example Co installs, repairs, and consults on widgets across Sampleville, with same-week bookings.",
+      "metaDescLen": 145,
+      "canonical": "https://www.acme-example.test/",
+      "dupOgTags": [],
+      "ogDescription": "Acme Example Co \u2014 widget installation, repair, and consulting across Sampleville.",
+      "h1Count": 1,
+      "h1s": [
+        "Widget Services You Can Trust"
+      ],
+      "h2Count": 3,
+      "headingSequence": [
+        "h1",
+        "h2",
+        "h2",
+        "h2"
+      ],
+      "jsonLdTypes": [
+        "Organization"
+      ],
+      "wordCount": 420,
+      "pTagWordCount": 300,
+      "dateModified": "2026-08-15",
+      "imageCount": 6,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 60000,
+      "internalHrefs": [
+        "https://www.acme-example.test/services/",
+        "https://www.acme-example.test/services/widget-installation/",
+        "https://www.acme-example.test/services/widget-repair/",
+        "https://www.acme-example.test/services/widget-consulting/",
+        "https://www.acme-example.test/about/",
+        "https://www.acme-example.test/contact/",
+        "https://www.acme-example.test/services/widget-warranty/"
+      ],
+      "contentInternalHrefs": [
+        "https://www.acme-example.test/services/"
+      ],
+      "noJsWordCount": 380
+    },
+    {
+      "url": "https://www.acme-example.test/services/",
+      "title": "Our Services | Acme Example Co",
+      "titleLen": 31,
+      "metaDesc": "Browse Acme Example Co's widget installation, repair, and consulting services in Sampleville.",
+      "metaDescLen": 133,
+      "canonical": "https://www.acme-example.test/services/",
+      "dupOgTags": [],
+      "ogDescription": "Widget installation, repair, and consulting services from Acme Example Co.",
+      "h1Count": 1,
+      "h1s": [
+        "Our Services"
+      ],
+      "h2Count": 3,
+      "headingSequence": [
+        "h1",
+        "h2",
+        "h2",
+        "h2"
+      ],
+      "jsonLdTypes": [],
+      "wordCount": 220,
+      "pTagWordCount": 150,
+      "dateModified": "2026-08-10",
+      "imageCount": 4,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 50000,
+      "internalHrefs": [
+        "https://www.acme-example.test/",
+        "https://www.acme-example.test/services/widget-installation/",
+        "https://www.acme-example.test/services/widget-repair/",
+        "https://www.acme-example.test/services/widget-consulting/"
+      ],
+      "contentInternalHrefs": [
+        "https://www.acme-example.test/services/widget-installation/",
+        "https://www.acme-example.test/services/widget-repair/",
+        "https://www.acme-example.test/services/widget-consulting/"
+      ],
+      "noJsWordCount": 200
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-installation/",
+      "title": "Widget Installation Services | Acme Example Co",
+      "titleLen": 48,
+      "metaDesc": "Professional widget installation across Sampleville \u2014 licensed technicians, same-week bookings, 2-year warranty.",
+      "metaDescLen": 141,
+      "canonical": "https://www.acme-example.test/services/widget-installation/",
+      "dupOgTags": [],
+      "ogDescription": "Licensed widget installation across Sampleville with a 2-year workmanship warranty.",
+      "h1Count": 1,
+      "h1s": [
+        "Widget Installation Services"
+      ],
+      "h2Count": 2,
+      "headingSequence": [
+        "h1",
+        "h2",
+        "h2"
+      ],
+      "jsonLdTypes": [
+        "Service"
+      ],
+      "wordCount": 650,
+      "pTagWordCount": 500,
+      "dateModified": "2026-08-20",
+      "imageCount": 5,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 90000,
+      "internalHrefs": [
+        "https://www.acme-example.test/services/",
+        "https://www.acme-example.test/services/widget-repair/",
+        "https://www.acme-example.test/services/widget-consulting/",
+        "https://www.acme-example.test/contact/"
+      ],
+      "contentInternalHrefs": [
+        "https://www.acme-example.test/services/widget-repair/"
+      ],
+      "noJsWordCount": 420,
+      "iframes": []
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-repair/",
+      "title": "Repair",
+      "titleLen": 6,
+      "metaDesc": "Widget repair.",
+      "metaDescLen": 15,
+      "canonical": "https://www.acme-example.test/services/widget-repair/",
+      "dupOgTags": [
+        "og:title"
+      ],
+      "ogDescription": "",
+      "h1Count": 2,
+      "h1s": [
+        "01",
+        "Widget Repair"
+      ],
+      "h2Count": 1,
+      "headingSequence": [
+        "h1",
+        "h1",
+        "h2"
+      ],
+      "jsonLdTypes": [],
+      "wordCount": 300,
+      "pTagWordCount": 100,
+      "dateModified": null,
+      "imageCount": 3,
+      "imagesMissingAlt": 2,
+      "viewport": "",
+      "hasAnalytics": false,
+      "bytes": 300000,
+      "internalHrefs": [
+        "https://www.acme-example.test/services/",
+        "https://www.acme-example.test/services/widget-installation/"
+      ],
+      "contentInternalHrefs": [],
+      "noJsWordCount": 50,
+      "iframes": []
+    },
+    {
+      "url": "https://www.acme-example.test/services/widget-consulting/",
+      "title": "Widget Consulting Services | Acme Example Co",
+      "titleLen": 46,
+      "metaDesc": "Independent widget consulting for procurement teams \u2014 audits, specs, and vendor selection support.",
+      "metaDescLen": 137,
+      "canonical": "https://www.acme-example.test/services/widget-consulting/",
+      "dupOgTags": [],
+      "ogDescription": "Independent widget consulting for procurement teams in Sampleville.",
+      "h1Count": 1,
+      "h1s": [
+        "Widget Consulting Services"
+      ],
+      "h2Count": 2,
+      "headingSequence": [
+        "h1",
+        "h2",
+        "h2"
+      ],
+      "jsonLdTypes": [
+        "Service"
+      ],
+      "wordCount": 560,
+      "pTagWordCount": 420,
+      "dateModified": "2026-07-30",
+      "imageCount": 4,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 85000,
+      "internalHrefs": [
+        "https://www.acme-example.test/services/",
+        "https://www.acme-example.test/services/widget-installation/"
+      ],
+      "contentInternalHrefs": [
+        "https://www.acme-example.test/services/widget-installation/"
+      ],
+      "noJsWordCount": 400,
+      "iframes": []
+    },
+    {
+      "url": "https://www.acme-example.test/about/",
+      "title": "About Acme Example Co",
+      "titleLen": 22,
+      "metaDesc": "Learn about Acme Example Co, our team, and our commitment to quality widget services.",
+      "metaDescLen": 128,
+      "canonical": "https://www.acme-example.test/about/",
+      "dupOgTags": [],
+      "ogDescription": "Meet the Acme Example Co team.",
+      "h1Count": 1,
+      "h1s": [
+        "About Us"
+      ],
+      "h2Count": 1,
+      "headingSequence": [
+        "h1",
+        "h2"
+      ],
+      "jsonLdTypes": [
+        "AboutPage"
+      ],
+      "wordCount": 380,
+      "pTagWordCount": 300,
+      "dateModified": "2026-06-01",
+      "imageCount": 4,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 55000,
+      "internalHrefs": [
+        "https://www.acme-example.test/"
+      ],
+      "contentInternalHrefs": [],
+      "noJsWordCount": 350
+    },
+    {
+      "url": "https://www.acme-example.test/contact/",
+      "title": "Contact Acme Example Co | Sampleville Office",
+      "titleLen": 45,
+      "metaDesc": "Get in touch with Acme Example Co \u2014 phone, email, and our Sampleville office address and map.",
+      "metaDescLen": 134,
+      "canonical": "https://www.acme-example.test/contact/",
+      "dupOgTags": [],
+      "ogDescription": "Contact Acme Example Co's Sampleville office.",
+      "h1Count": 1,
+      "h1s": [
+        "Contact Us"
+      ],
+      "h2Count": 1,
+      "headingSequence": [
+        "h1",
+        "h2"
+      ],
+      "jsonLdTypes": [
+        "Organization"
+      ],
+      "wordCount": 250,
+      "pTagWordCount": 180,
+      "dateModified": "2026-05-20",
+      "imageCount": 2,
+      "imagesMissingAlt": 0,
+      "viewport": "width=device-width, initial-scale=1",
+      "hasAnalytics": true,
+      "bytes": 45000,
+      "internalHrefs": [
+        "https://www.acme-example.test/",
+        "https://www.acme-example.test/services/widget-instalation/"
+      ],
+      "contentInternalHrefs": [],
+      "noJsWordCount": 220,
+      "iframes": [
+        "https://www.google.com/maps?q=Acme+Example+Co+123+Example+Street+Sampleville"
+      ]
+    }
+  ]
+}

@@ -87,7 +87,9 @@ python3 -m seo_geo_engine.render_html_report \
 ```
 
 Engineering decisions for the remaining loop live in
-[`docs/PLAN.md`](docs/PLAN.md).
+[`docs/PLAN.md`](docs/PLAN.md). Optional post-crawl enrichment
+(`seo-geo-enrich --pagespeed --gsc`) is documented there and in
+[`docs/design/enrichment.md`](docs/design/enrichment.md).
 
 The HTML dashboard is a plain, deterministic static file — open it directly,
 serve it with `python3 -m http.server`, or push it to any static host.
@@ -123,6 +125,7 @@ seo_geo_engine/            — the installable package
   remediation/                — remediation-tracking layer (mirrors checks/)
   crawl/                      — crawler CLI + local-serve-and-crawl mode
   crawler/                    — the packaged Playwright crawler (crawl.js)
+  enrichment/                 — post-crawl PageSpeed Insights / Search Console merge
   testing/                    — reusable pytest assertions a profile can import
   standard/default/           — the engine's shipped, non-business-specific rule set
   skills/, routines/           — Skill/governance-routine templates a profile scaffolds
@@ -151,8 +154,8 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
 - [x] Skill template + `seo-geo-init-profile` scaffold command — a
       brand-new profile passes its own generated test with zero
       hand-written logic beyond `site.yaml`. Fast pytest (including the
-      new plan-sync / schema / scaffold coverage) plus 16 JS crawler
-      unit tests; slow Playwright tests on main.
+      new plan-sync / schema / scaffold / enrichment coverage) plus 16 JS
+      crawler unit tests; slow Playwright tests on main.
 - [x] Engine-owned remediations for every default standard ID (generic
       playbooks + SCHEMA-001 / OG-002 script handlers), `seo-geo-plan-sync`
       to bootstrap/prune `remediation-plan.md`, `seo-geo-remediate --id` to
@@ -160,6 +163,11 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       JSON Schema, and GitHub Actions CI. A new profile can be crawled,
       scored, queued, and worked without copying engine code. See
       [docs/PLAN.md](docs/PLAN.md).
+- [x] Enrichment: `seo-geo-enrich` post-crawl merge of PageSpeed Insights
+      (mobile lab LCP/CLS) and Search Console sitemap status. GSC client
+      libs are `pip install seo-geo-engine[enrich]`; credentials stay in
+      the environment. See
+      [docs/design/enrichment.md](docs/design/enrichment.md).
 - [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
       Skill-only path has been used for real; not required for the loop
       above to work today. See [docs/design/mcp.md](docs/design/mcp.md).
