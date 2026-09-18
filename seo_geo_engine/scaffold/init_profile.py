@@ -136,8 +136,9 @@ README_TEMPLATE = """\
 # {org_name} — SEO/GEO profile
 
 A profile for [seo-geo-engine](https://github.com/sevasek/seo-geo-engine) —
-see that repo's own README and `docs/PLAN.md` for the full engine
-documentation. This directory holds only what's specific to {org_name}:
+see that repo's `docs/SYSTEM.md` (how the engine is built) and
+`docs/PLAN.md` (construction schedule). This directory holds only what's
+specific to {org_name}:
 `site.yaml`, `standard/extensions.md`, `checks_ext.py`, `handlers.py`,
 `remediation-plan.md`, `playbooks/` (overrides only — engine playbooks are
 the fallback).

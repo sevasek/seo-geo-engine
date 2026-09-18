@@ -11,6 +11,7 @@ def test_scaffold_writes_engine_repo_url_and_empty_plan(tmp_path):
     assert "https://github.com/sevasek/seo-geo-engine" in readme
     assert "seo-geo-run" in readme
     assert "seo-geo-verify" in readme
+    assert "docs/SYSTEM.md" in readme
 
     plan = (target / "remediation-plan.md").read_text(encoding="utf-8")
     assert "| ID | Approach | Depends on | Status | Notes |" in plan
@@ -22,3 +23,4 @@ def test_scaffold_writes_engine_repo_url_and_empty_plan(tmp_path):
     assert "seo-geo-verify" in skill
     assert "docs/design/data-contract.md" in skill
     assert "docs/design/enrichment.md" in skill
+    assert "docs/SYSTEM.md" in skill

@@ -1,9 +1,11 @@
 # Phased plan
 
-The README already states the end state. This document is the
-engineering path from "the engine works on a synthetic profile" to
-"point this at a real site repo and an agent can take the score from
-wherever it starts to a verified result."
+The README already states the end state. [SYSTEM.md](SYSTEM.md) is the
+**site plan**: goals vs objectives, the infrastructures that stand or
+still need erecting, and how they relate. This document is the
+**construction schedule** from "the engine works on a synthetic
+profile" to "point this at a real site repo and an agent can take the
+score from wherever it starts to a verified result."
 
 ## Goal (what "up and running" means)
 
@@ -359,9 +361,15 @@ item rotting.
 
 ## How to use this document
 
-When a new idea shows up, put it in a phase or reject it against "What
-not to do." If it needs a design decision, add or amend a file under
-`docs/design/` *before* writing the code — the files in this directory
-are the decisions, not a promise that the code already matches them.
-After a phase lands, update the README Status checklist and this
-plan's "What's already built" so the three can't drift.
+When a new idea shows up, name the infrastructure it belongs to in
+[SYSTEM.md](SYSTEM.md) (or reject it against that file's non-goals /
+this file's "What not to do"). If it needs a design decision, add or
+amend a file under `docs/design/` *before* writing the code — the
+files in this directory are the decisions, not a promise that the
+code already matches them. Put accepted work in a phase below. After
+a phase lands, update the README Status checklist, SYSTEM.md's status
+cells, and this plan's "What's already built" so the three can't
+drift.
+
+SYSTEM.md is the site plan (goals, infrastructures, relationships).
+This file is the construction schedule. Do not duplicate the map here.

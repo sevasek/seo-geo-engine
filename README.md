@@ -25,6 +25,15 @@ repeat again next quarter as the standard itself evolves. A profile is
 cheap enough to add that a new client site is a `site.yaml` and maybe a
 handful of rows, not a new repo to maintain in lockstep with the last one.
 
+**Agents building or extending this engine:** read
+[`docs/SYSTEM.md`](docs/SYSTEM.md) before writing code. It states the
+goal vs the measurable objectives, names each infrastructure (profile,
+crawl contract, gather, score, remediate, operator path, trust,
+versioning, MCP, legacy forks), and how those pieces join — including
+what still needs erecting and what must not be built. [`docs/PLAN.md`](docs/PLAN.md)
+is the construction schedule for that map. Auditing a *site* uses that
+profile's Skill, not SYSTEM.md.
+
 This build is the engine and one worked example (`examples/sample-profile/`,
 entirely synthetic). The two real site-specific repos this generalizes —
 `auto-ps-seo-audit` and `sevasek-com-seo-audit` — still run their own
@@ -76,8 +85,9 @@ seo-geo-verify \
 A live or local-serve crawl needs Playwright Chromium in
 `seo_geo_engine/crawler/` (`npm install` and `npx playwright install chromium`).
 `pip install -e ".[dev]"` is enough for scoring and the fast test suite, not
-for a real-browser crawl. Engineering decisions for the remaining loop live
-in [`docs/PLAN.md`](docs/PLAN.md).
+for a real-browser crawl. Engineering decisions for the remaining loop live in
+[`docs/SYSTEM.md`](docs/SYSTEM.md) (map) and [`docs/PLAN.md`](docs/PLAN.md)
+(schedule).
 
 The HTML dashboard is a plain, deterministic static file — open it directly,
 serve it with `python3 -m http.server`, or push it to any static host.
@@ -120,7 +130,7 @@ seo_geo_engine/            — the installable package
   standard/default/           — the engine's shipped, non-business-specific rule set
   skills/, routines/           — Skill/governance-routine templates a profile scaffolds
   scaffold/                    — `seo-geo-init-profile` — scaffold a new profile
-docs/                         — PLAN.md + design docs for the remaining loop
+docs/                         — SYSTEM.md (map) + PLAN.md (schedule) + design docs
 tests/                        — the engine's own test suite (fixtures + traceability)
 examples/sample-profile/       — synthetic worked example, not a real dependent
 ```
@@ -151,7 +161,7 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       run a script handler, `seo-geo-update-status` CLI, crawl site-dict
       JSON Schema, and GitHub Actions CI. A new profile can be crawled,
       scored, queued, and worked without copying engine code. See
-      [docs/PLAN.md](docs/PLAN.md).
+      [docs/SYSTEM.md](docs/SYSTEM.md) and [docs/PLAN.md](docs/PLAN.md).
 - [x] Enrichment: `seo-geo-enrich` post-crawl merge of PageSpeed Insights
       (mobile lab LCP/CLS) and Search Console sitemap status. GSC client
       libs are `pip install seo-geo-engine[enrich]`; credentials stay in

@@ -12,6 +12,13 @@ decision procedure on which one a new rule belongs in. This file assumes
 that repo is installed (`pip install seo-geo-engine`, or an editable local
 checkout during co-development).
 
+This Skill is the **runbook for auditing {{ORG_NAME}}**. How the engine
+itself is built — goals, infrastructures (crawler, contract, scoring
+triangle, remediations, verify, versioning), and what still needs
+erecting — lives in that repo's `docs/SYSTEM.md`. Do not add engine
+kernel code to this profile; if a change needs a business fact it
+belongs here, otherwise it belongs in the engine.
+
 ## 1. Evolving the standard
 
 When a new SEO/GEO angle comes up (a tweet, a competitor page, a piece of
