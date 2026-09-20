@@ -116,7 +116,7 @@ def test_c2_five_tools_against_sample_profile(mcp_env):
 
 def test_operator_tools_registered_and_aliases_work(mcp_env):
     server = mcp_env["server"]
-    names = {tool.name for tool in server.list_tools()}
+    names = {tool.name for tool in asyncio.run(server.list_tools())}
     assert set(_C2_TOOLS) <= names
     assert set(_OPERATOR_TOOLS) <= names
 
