@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seo-geo-engine"
-version = "0.1.0"
+version = "0.2.0"
 description = "A website-agnostic SEO/GEO audit-and-remediation engine: a weighted rule standard, a check registry, a remediation-tracking layer, and a report/dashboard generator, all driven by a per-site profile instead of being forked per site."
 readme = "README.md"
 requires-python = ">=3.11"

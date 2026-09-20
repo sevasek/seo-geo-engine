@@ -1,9 +1,10 @@
 # Design: engine versioning and profile compatibility
 
-**Status:** accepted (policy). Package version is `0.1.0`. Tags and
-GitHub releases are cut as we ship versions; nothing is published to
-PyPI until a real profile wants a non-editable install. `1.0.0` remains
-a Phase 3 *exit* after a real profile has migrated.
+**Status:** accepted (policy). Package version is `0.2.0`. `v0.1.0`
+is the extract; `v0.2.0` is the first tag with the operator path.
+Nothing is published to PyPI until a real profile wants a
+non-editable install. `1.0.0` remains a Phase 3 *exit* after a real
+profile has migrated.
 
 **Why this needs a design doc.** A profile is supposed to *depend on*
 this package, not fork it. The moment `auto-ps-seo-audit` pins
@@ -27,8 +28,8 @@ Profiles pin the current 0.x minor so they take PATCH fixes without
 automatically picking up new standard IDs from the next MINOR:
 
 ```
-seo-geo-engine>=0.1,<0.2    # current 0.1.x
-seo-geo-engine>=0.2,<0.3    # after a 0.2 MINOR (same 0.x pattern)
+seo-geo-engine>=0.1,<0.2    # v0.1.0 extract only
+seo-geo-engine>=0.2,<0.3    # current 0.2.x (run / plan-sync / enrich / verify)
 seo-geo-engine>=1.0,<2.0    # after 1.0
 ```
 
@@ -138,7 +139,8 @@ a site disagrees with a default.
 
 - `CHANGELOG.md` ships with this policy (Phase 3 start); the first
   entry is 0.1.0, the initial extract.
-- README Status points here; 0.x pin is `seo-geo-engine>=0.1,<0.2`.
+- README Status points here; current 0.x pin is
+  `seo-geo-engine>=0.2,<0.3`.
 - Tag releases (`v0.1.0`, then `v0.2.0`, …) as we cut versions. Don't
   publish to PyPI until at least one real profile wants a non-editable
   install; editable + git tag is enough for the first migration.

@@ -33,7 +33,7 @@ are means to that loop, not substitutes for it.
 
 ## What's already built
 
-The engine is a Python package (`seo-geo-engine` 0.1.0) plus a
+The engine is a Python package (`seo-geo-engine` 0.2.0) plus a
 packaged Playwright crawler. A synthetic profile
 (`examples/sample-profile/`, "Acme Example Co") proves the pieces
 compose. Fast tests run in GitHub Actions on every PR; slow crawler

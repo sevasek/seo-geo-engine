@@ -380,13 +380,15 @@ The public API is **crawl JSON + check ID semantics + `@check` /
 `@remediate` signatures**, not merely Python module names.
 
 **Standing.** Decision record: [design/versioning.md](design/versioning.md).
-Package version is `0.1.0`. Treat 0.x like 1.x for compatibility
-(do not casual-break). Sample profile is the intended canary.
+Package version is `0.2.0` (`v0.1.0` is the extract). Treat 0.x like
+1.x for compatibility (do not casual-break). Sample profile is the
+0.2.x canary. `CHANGELOG.md` records IDs / crawl-contract / migration
+notes. Current pin: `seo-geo-engine>=0.2,<0.3`.
 
-**Not erected.** `CHANGELOG.md` in the Keep a Changelog shape this
-policy requires; README pin language (`>=0.1,<0.2`); 1.0.0 after one
-real profile has been on the engine. Sibling work exists; this branch
-does not land it. **Do not migrate a living audit (O4) without this.**
+**Not erected.** The `v0.2.0` git tag (cut after this version is on
+`main`). 1.0.0 after one real profile has been on the engine.
+**Do not migrate a living audit (O4) onto `v0.1.0`** — pin `v0.2.0`
+so plan-sync / run / verify exist.
 
 **Relates to.** I2 (required-field changes are MAJOR). I5 (new default
 ID is MINOR; same ID with new *meaning* is MAJOR or a new ID). I1
@@ -552,9 +554,8 @@ belongs to (or reject it as a non-goal), then put it in a phase.
 
 In dependency order. Do not start a later item to look busy.
 
-1. **I10 in this repo** — CHANGELOG + pin language matching
-   [design/versioning.md](design/versioning.md). (Sibling PR; rebase /
-   land relative to this branch as needed.)
+1. **`v0.2.0` tag** — after the 0.2.0 version bump is on `main`
+   (`git tag v0.2.0 && git push origin v0.2.0`). Do not move `v0.1.0`.
 2. **I12 first migration** — in `auto-ps-seo-audit` *or* the smaller
    fork; editable pin during the PR, version pin at merge. Procedure:
    [design/profile-migration.md](design/profile-migration.md).
