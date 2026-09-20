@@ -28,7 +28,9 @@ the heading is not.
 
 ### Added
 
-None.
+- `seo-geo-mcp` thin host adapter (`pip install seo-geo-engine[mcp]`). Same
+  functions as the CLI; one profile per process; no CMS writes. mcp
+  `>=1.0,<3` (2.x `MCPServer`, 1.x `FastMCP`).
 
 ### Standard IDs added
 
@@ -95,6 +97,8 @@ None in the crawler. `pageSpeed` and `searchConsole` are now produced by
   populate `remediation-plan.md`.
 - Optional: `pip install seo-geo-engine[enrich]` and `seo-geo-enrich` if
   PERF-002 / PERF-003 / CRAWL-008 should leave runtime-blocked.
+- Optional: `pip install seo-geo-engine[mcp]` and `seo-geo-mcp --profile
+  site.yaml` if the host prefers tools to the CLI.
 
 ## [0.1.0] - 2026-09-11
 

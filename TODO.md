@@ -144,22 +144,31 @@ Phase 6 and [docs/design/mcp.md](docs/design/mcp.md) wait on a Skill-only
 loop closing an item on a migrated profile (O6). If that never happens,
 skip C indefinitely.
 
-- [ ] **C1. Confirm the `mcp` PyPI package name/API** the
-      `pyproject.toml` `mcp>=1.0` extra assumes is still correct — read
+- [x] **C1. Confirm the `mcp` PyPI package name/API** the
+      `pyproject.toml` extra assumes is still correct — read
       that package's own README/examples before writing server code; this
       doesn't pin exact API calls because that surface may have moved.
-- [ ] **C2. Implement `seo_geo_engine/mcp_server/server.py`** — 5 tools,
+      Confirmed: PyPI package is `mcp`. 2.x renamed `FastMCP` →
+      `MCPServer` (`from mcp.server.mcpserver import MCPServer`); 1.x
+      still uses `FastMCP`. Extra pinned `mcp>=1.0,<3` with a 1.x import
+      fallback.
+- [x] **C2. Implement `seo_geo_engine/mcp/server.py`** (design path;
+      `seo_geo_engine/mcp_server/server.py` re-exports) — 5 tools,
       each a thin wrapper around an existing function, no new business
-      logic: `run_site_audit` → crawl (live/local) + `report.run_report`;
-      `get_audit_issues` → `report.top_issues`; `get_remediation_queue` →
+      logic: `run_site_audit` → `seo_geo_engine.run.run` (crawl live/local
+      or `--from-crawl` + report); `get_audit_issues` →
+      `report.top_issues`; `get_remediation_queue` →
       `remediation.plan.build_queue`; `set_remediation_status` →
       `remediation.remediation_loader.update_status`; `regenerate_report`
-      → `render_markdown`/`render_json`/`render_html_report`.
-      **Test:** a script that starts the server in-process and calls each
-      of the 5 tools once against `examples/sample-profile/`, asserting
-      each returns without raising and `run_site_audit`'s result contains
-      a `score` key.
-- [ ] **C3. Document it** — one "Agent interface (MCP)" section in
+      → `render_markdown`/`render_json`/`render_html_report`. Operator
+      names from `docs/design/mcp.md` are also registered (`crawl`,
+      `enrich`, `score`, `plan_sync`, `queue`, `remediate_script`,
+      `update_status`, `verify`).
+      **Test:** `tests/test_mcp_server.py` starts the server in-process
+      and calls each of the 5 tools once against
+      `examples/sample-profile/`, asserting each returns without raising
+      and `run_site_audit`'s result contains a `score` key.
+- [x] **C3. Document it** — one "Agent interface (MCP)" section in
       README, `pip install seo-geo-engine[mcp]` + how to point Claude/Cursor
       at it.
 
@@ -185,7 +194,7 @@ skip C indefinitely.
       2026-08-31 crawl unchanged for every shared ID, repo down to ~6
       profile-specific files
 - [ ] `sevasek-com-seo-audit`: same, with its own crawl fixture
-- [ ] MCP smoke-test script exercises all 5 tools against the sample
+- [x] MCP smoke-test script exercises all 5 tools against the sample
       profile without error
 - [x] Compatibility policy exists at `docs/design/versioning.md` and
       reads like it's meant for a pinned dependent, with `CHANGELOG.md`

@@ -47,6 +47,13 @@ One command gathers a dated snapshot and scores it. Do not reconstruct the
 individual crawl/report/plan-sync/queue/HTML flags unless you are debugging
 a single step.
 
+If your host has MCP (`seo-geo-mcp --profile site.yaml`), call the
+matching tools (`run_site_audit`, `get_remediation_queue`,
+`set_remediation_status` / `update_status`, `remediate_script`,
+`verify`) instead of the shell commands below. The CLI is equivalent.
+MCP does not change this Skill's rules: don't hand-edit reports, don't
+invent copy, don't write to a CMS, apply artifacts on the website.
+
 Live URL (needs Playwright Chromium in the engine's `crawler/` directory —
 `npm install` and `npx playwright install chromium`; `pip install` is not
 enough for that step):

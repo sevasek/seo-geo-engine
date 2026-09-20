@@ -118,9 +118,11 @@ See [design/engine-owned-remediation.md](design/engine-owned-remediation.md).
 The Skill tells an agent which commands to run. `seo-geo-run` is the
 gather-and-score orchestrator; `seo-geo-verify` diffs two dated JSON
 reports (`--id`, `--require-not-worse`). Enrichment is also available
-standalone as `seo-geo-enrich`. See
-[design/agent-loop.md](design/agent-loop.md). A verified flip on a
-*real* migrated profile is still the rest of Phase 4, after Phase 3.
+standalone as `seo-geo-enrich`. Hosts that prefer tools can call the
+same functions through `seo-geo-mcp`. See
+[design/agent-loop.md](design/agent-loop.md) and
+[design/mcp.md](design/mcp.md). A verified flip on a *real* migrated
+profile is still the rest of Phase 4, after Phase 3.
 
 ### Tests
 
@@ -142,6 +144,8 @@ standalone as `seo-geo-enrich`. See
 - `seo-geo-enrich` against recorded PSI/GSC fixtures (no live Google).
 - `seo-geo-run --from-crawl` and `seo-geo-verify` against the sample
   profile and synthetic report JSON.
+- `seo-geo-mcp` in-process tool calls against the sample profile
+  (`tests/test_mcp_server.py`; extra `[mcp]`).
 
 GitHub Actions runs fast `pytest` plus crawler unit tests on every PR;
 `pytest -m slow` (Playwright Chromium) on pushes to main. Default
@@ -151,8 +155,8 @@ run a real crawl.
 
 ### Explicitly not built (from the README)
 
-- MCP server (`[project.optional-dependencies] mcp` is declared;
-  there is no server module). Deferred on purpose — see
+- A real-site verified flip (O6). The MCP adapter (`seo-geo-mcp`) is
+  shipped as a thin wrapper; it is not that proof. See
   [design/mcp.md](design/mcp.md).
 - Migration of `auto-ps-seo-audit` and `sevasek-com-seo-audit` — they
   still run forked copies. See
@@ -171,7 +175,7 @@ gaps; engine-side Phase 4 commands are shipped):
 |---|---|
 | Real-site migration | Engine commands close the loop on the synthetic sample. A verified flip on a living audit still needs Phase 3. |
 | Enrichment needs credentials | PERF-002, PERF-003, CRAWL-008 still runtime-block on a crawl-only JSON. `seo-geo-enrich` / `seo-geo-run --enrich` write the blobs when keys are present. |
-| Global `REGISTRY` | Importing two profiles in one process would collide on ID. Fine for CLI-per-profile; a future MCP/multi-site runner would not be. |
+| Global `REGISTRY` | Importing two profiles in one process would collide on ID. Fine for CLI-per-profile; `seo-geo-mcp` binds one profile and refuses a second. |
 | 9 blocked default rows | They occupy weight in the score with no path to earn it. A new site starts with a structural hole (CONTENT-004–008, LINK-006–008, PERF-004). |
 | LINK ID gap | Engine linking starts at LINK-004. LINK-001/002 live in the sample profile. LINK-003 does not exist. Leave it; don't backfill. |
 
@@ -349,13 +353,12 @@ maps) versus which must wait for a method that does not exist.
 The engine's default standard has not grown a new blocked stub in the
 process.
 
-### Phase 6 — MCP, if the Skill path was actually used
+### Phase 6 — MCP host adapter
 
-Build the server in [design/mcp.md](design/mcp.md) only after Phase 4's
-exit criterion is true. It is a thin wrapper over the same functions
-the CLI already exposes. If Phase 4 never happened, skip this phase
-indefinitely — that is an explicit README position, not a backlog
-item rotting.
+Built as specified in [design/mcp.md](design/mcp.md): thin wrapper
+over the same functions the CLI already exposes (`seo-geo-mcp`, extra
+`[mcp]`). In-process tests against the sample profile. Phase 4's
+real-site exit (O6) is still open; this adapter does not close it.
 
 ## What not to do
 
@@ -369,8 +372,8 @@ item rotting.
   humans (or a profile-owned, out-of-engine apply step) publish.
 - Don't fork this repo per site. If a change needs a business fact, it
   belongs in that site's profile.
-- Don't ship MCP, a web UI, or a multi-site runner before one real
-  profile has completed the loop.
+- Don't treat the MCP adapter as a substitute for a real-site
+  verified flip, a web UI, or a multi-site runner.
 
 ## How to use this document
 

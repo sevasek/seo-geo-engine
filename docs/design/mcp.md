@@ -1,15 +1,12 @@
 # Design: MCP server
 
-**Status:** deferred (Phase 6). `pyproject.toml` already declares
-`mcp = ["mcp>=1.0"]`. There is no server module. The README is
-explicit: not required for the loop to work, and not started until
-the Skill-only path has been used for real.
+**Status:** implemented. `pip install seo-geo-engine[mcp]` (pinned
+`mcp>=1.0,<3`) and `seo-geo-mcp --profile site.yaml`. The CLI and the
+Skill remain the testable, scriptable surface; this is a host adapter.
 
-**Why this needs a design doc anyway.** Optional extras that never
-gain a module become folklore. If and when Phase 4's exit criterion
-is true (an agent following only the scaffolded Skill flipped a
-real item to pass), this is the shape to build — so Phase 6 doesn't
-invent a parallel scoring path.
+C1 confirmed the PyPI name is still `mcp`. mcp 2.x renamed `FastMCP` to
+`MCPServer` (`from mcp.server.mcpserver import MCPServer`). mcp 1.x
+still exports `FastMCP`; the server module tries 2.x then 1.x.
 
 ## Decision
 
@@ -24,22 +21,23 @@ not a second engine.
   multi-profile-safe; see [agent-loop.md](agent-loop.md)).
 - Install: `pip install seo-geo-engine[mcp]`.
 
-If Phase 4 never happens, do not build this.
-
-## Tools (when built)
+## Tools
 
 Expose the operator path, not a chat-oriented paraphrase of the
-standard:
+standard. TODO C2 also names five gather/queue tools that wrap the
+same functions; both names are registered.
 
 | Tool | Wraps |
 |---|---|
+| `run_site_audit` | `seo_geo_engine.run.run` (crawl live/local/`from_crawl` + report + plan-sync + queue + HTML) |
+| `get_audit_issues` | `report.top_issues` |
+| `get_remediation_queue` / `queue` | `build_queue` |
+| `set_remediation_status` / `update_status` | `update_status()` |
+| `regenerate_report` / `score` | `run_report` + write markdown/JSON/HTML |
 | `crawl` | `seo_geo_engine.crawl.run` (`local: bool`) |
 | `enrich` | Phase 2 enricher, flags for psi/gsc |
-| `score` | `run_report` + write markdown/JSON/HTML |
 | `plan_sync` | Phase 1 plan-sync |
-| `queue` | `build_queue` |
 | `remediate_script` | run one `--id` script handler, return artifact text + path |
-| `update_status` | `update_status()` |
 | `verify` | Phase 4 report diff |
 
 Do not add `explain_rule` that rewrites standard markdown through an
@@ -61,23 +59,23 @@ commands an agent will call in the wrong order.
 
 ## Alternatives considered
 
-**Build MCP now so the engine looks complete.** Rejected by the
-README. A server wrapping an incomplete loop (no plan-sync, no
-engine playbooks, no enricher) would teach agents a broken
-procedure.
+**Build MCP now so the engine looks complete.** Originally rejected
+by the README until a Skill-only path had been used for real. The
+TODO C items + operator request shipped the wrapper anyway; a
+real-site verified flip (O6) is still a different objective.
 
 **MCP as the primary API, CLI as a client.** Rejected. CLI is the
-testable, scriptable surface; CI calls it. MCP, if it exists, sits
-on top.
+testable, scriptable surface; CI calls it. MCP sits on top.
 
 **Multi-site tool that takes a list of profiles.** Not until
-registries are isolated. Out of scope even for Phase 6 v1.
+registries are isolated. Out of scope for v1.
 
-## Implementation notes (only in Phase 6)
+## Implementation
 
-- New module `seo_geo_engine.mcp.server`, console script
+- Module `seo_geo_engine.mcp.server` (TODO C2 path
+  `seo_geo_engine.mcp_server.server` re-exports), console script
   `seo-geo-mcp`.
-- Fast tests with in-memory crawl fixtures; no live MCP host in CI.
-- Update the Skill with "if your host has MCP, call these tools;
-  otherwise the CLI is equivalent."
-- Do not block any earlier phase on this document.
+- Fast tests (`tests/test_mcp_server.py`) with the sample-profile
+  crawl fixture; no live MCP host in CI.
+- Skill: if the host has MCP, call these tools; otherwise the CLI
+  is equivalent.
