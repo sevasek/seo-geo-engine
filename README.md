@@ -99,6 +99,38 @@ Nothing in the scoring/report/dashboard pipeline is AI-authored or
 AI-interpreted, and it's never published through a hosted "Artifact"
 system — that's a deliberate design choice, not an oversight.
 
+## Agent interface (MCP)
+
+Hosts that prefer tools to a shell can call the same operator path
+through MCP. This does not replace the CLI or the Skill — it wraps the
+functions those already expose. One profile per process (the check
+registry is not multi-profile-safe). No CMS writes.
+
+```bash
+pip install seo-geo-engine[mcp]
+seo-geo-mcp --profile /path/to/site.yaml
+```
+
+Point Claude Desktop or Cursor at the console script:
+
+```json
+{
+  "mcpServers": {
+    "seo-geo-engine": {
+      "command": "seo-geo-mcp",
+      "args": ["--profile", "/absolute/path/to/site.yaml"]
+    }
+  }
+}
+```
+
+Tools: `run_site_audit` (seo-geo-run), `get_audit_issues`,
+`get_remediation_queue`, `set_remediation_status`, `regenerate_report`,
+plus the step-by-step operator names (`crawl`, `enrich`, `score`,
+`plan_sync`, `queue`, `remediate_script`, `update_status`, `verify`).
+If the host has no MCP, the CLI is equivalent. See
+[docs/design/mcp.md](docs/design/mcp.md).
+
 ## How a profile works
 
 A profile is a directory with:
@@ -125,6 +157,7 @@ seo_geo_engine/            — the installable package
   report.py                  — scoring, top-issues ranking, markdown/JSON report, CLI
   run.py                     — seo-geo-run: crawl → optional enrich → report → plan-sync → queue → HTML
   verify.py                  — seo-geo-verify: diff two dated report JSONs
+  mcp/                       — seo-geo-mcp: optional host adapter over the same functions
   render_html_report.py      — deterministic static HTML dashboard generator
   enrichment/                — post-crawl PageSpeed Insights / Search Console merge
   remediation/                — remediation-tracking layer (mirrors checks/)
@@ -179,9 +212,12 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       The Skill template sequences those commands. Proven against the
       sample profile; a real-site verified flip still waits on a live
       migration. See [docs/design/agent-loop.md](docs/design/agent-loop.md).
-- [ ] MCP server (`pip install seo-geo-engine[mcp]`) — deferred until the
-      Skill-only path has been used for real; not required for the loop
-      above to work today. See [docs/design/mcp.md](docs/design/mcp.md).
+- [x] MCP server (`pip install seo-geo-engine[mcp]`, `seo-geo-mcp
+      --profile site.yaml`) — thin wrapper over the same functions the
+      CLI already exposes; one profile per process; no CMS writes.
+      In-process tests against the sample profile. Not a substitute for
+      a real-site verified flip. See
+      [docs/design/mcp.md](docs/design/mcp.md).
 - [ ] Migrate `auto-ps-seo-audit` into a real profile depending on this
       engine (drop its own copy of `framework.py`/`standard_loader.py`/
       `report.py`/etc., keep only `site.yaml` + its business-specific

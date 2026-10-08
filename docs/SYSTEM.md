@@ -67,12 +67,13 @@ unblocking every GEO row, and migrating both legacy audits are
 | O5 | Engine operator path is one gather command + a verify command; Skill sequences them. | **Engine half met** (Phase 4 commands). |
 | O6 | On a **migrated** profile, an agent following only the Skill takes at least one script item and one manual item to a verified pass (re-crawl, not a Status cell). | **Not met.** Blocked on O4. |
 | O7 | Second legacy audit migrated the same way. Generic rules discovered during migration move into engine defaults with fixtures; business facts stay in that profile. Default standard does not grow a new blocked stub in the process. | **Not met** (Phase 5). |
-| O8 | MCP server, only if O6 happened: thin wrapper over the same functions the CLI already exposes. | **Deferred** (Phase 6). Skip indefinitely if O6 never happens. |
+| O8 | MCP server, only if O6 happened: thin wrapper over the same functions the CLI already exposes. | **Engine half met** (TODO C). Host adapter exists; O6 is still unmet. Not a substitute for a real verified flip. |
 
 Objectives are not calendar. An objective is done when its exit
-criterion is true, including tests. Do not start O8 to make the
-package look complete. Do not migrate both forks in parallel (O4 then
-O7): the first migration is how we learn whether the split holds.
+criterion is true, including tests. O8 shipped as a host adapter
+before O6 because TODO C asked for it; that does not make O6 true.
+Do not migrate both forks in parallel (O4 then O7): the first
+migration is how we learn whether the split holds.
 
 ### Non-goals (do not erect)
 
@@ -316,7 +317,8 @@ scaffold time.
 
 **Standing.** Skill template with org-name substitution; PR-review
 routine template; `seo-geo-init-profile`. Skill describes `seo-geo-run`,
-`--enrich`, `seo-geo-remediate --id`, `update-status`, `seo-geo-verify`.
+`--enrich`, `seo-geo-remediate --id`, `update-status`, `seo-geo-verify`,
+and that MCP tools are equivalent to those CLIs when the host has them.
 
 **Not erected.** A Skill that has been **used for real** on a migrated
 profile (O6). Until then, playbooks that say "this is illustrative"
@@ -398,11 +400,14 @@ ID is MINOR; same ID with new *meaning* is MAJOR or a new ID). I1
 
 **Job.** Same operator path for hosts that prefer tools to a shell.
 
-**Standing.** `pyproject.toml` extra `mcp = ["mcp>=1.0"]`. **No
-server module.**
+**Standing.** `pyproject.toml` extra `mcp = ["mcp>=1.0,<3"]`.
+`seo-geo-mcp --profile site.yaml`. Module
+`seo_geo_engine.mcp.server`. In-process tests against the sample
+profile. Thin wrapper; no scoring logic; no CMS writes; one profile
+per session.
 
-**Not erected.** Entirely. Only after O6. Thin wrapper; no scoring
-logic; no CMS writes; one profile per session.
+**Not erected.** A session that has closed a real item through these
+tools (that is O6, not a second server). Multi-profile isolation.
 
 **Relates to.** I8 (what it wraps). I7 (does not replace the Skill).
 I1 (global `REGISTRY` is why multi-site MCP is not v1).
@@ -505,6 +510,7 @@ re-implementing scoring.
 | `seo-geo-update-status` | I6 | Status/Notes only. |
 | `seo-geo-run` | I8 → I3–I6 | Gather-and-score orchestrator. |
 | `seo-geo-verify` | I8 | Diff two report JSONs. |
+| `seo-geo-mcp` | I11 | Optional host adapter over the same functions. |
 
 `python3 -m seo_geo_engine.render_html_report` is the dashboard step;
 `seo-geo-run` already invokes it.
@@ -519,7 +525,7 @@ I2 contract
  │           ├─ I6 remediation (needs verdicts)
  │           │   └─ I8 run/verify (needs plan-sync + report JSON)
  │           │       ├─ I7 Skill (names I8)
- │           │       └─ I11 MCP (wraps I8; only after O6)
+ │           │       └─ I11 MCP (wraps I8; adapter shipped, O6 still open)
  │           └─ I9 trust (fixtures per open check)
  └─ I10 versioning (API = contract + ID semantics)
          └─ I12 migration (must pin I10)
@@ -542,7 +548,7 @@ closed a real item.
 | 3 | I10 then first I12 → real I1 | I2, I5, I6, I10 |
 | 4 | I8 commands (engine half shipped); O6 on real I1 | I8 standing; O6 needs Phase 3 |
 | 5 | Second I12; maybe I5 growth (open rows only) | O6 lessons |
-| 6 | I11 | O6 true |
+| 6 | I11 (adapter shipped) | O6 remains the real-site proof |
 
 [PLAN.md](PLAN.md) is the construction schedule. This file is the
 site plan. When a new idea shows up, name the infrastructure it
@@ -566,7 +572,8 @@ In dependency order. Do not start a later item to look busy.
    checks into I5 here (with fixtures); leave business facts in I1.
 5. **I5 growth** — only open rows with a real method; never a new
    Kind A stub. [design/blocked-rules.md](design/blocked-rules.md).
-6. **I11 MCP** — only if step 3 happened. [design/mcp.md](design/mcp.md).
+6. **I11 MCP** — adapter shipped (`seo-geo-mcp`). Still not a
+   substitute for step 3. [design/mcp.md](design/mcp.md).
 
 Out of queue on purpose: registry isolation, `externalPresence`
 producer, CrUX INP, CMS apply in the engine, hosted dashboard.
@@ -606,7 +613,7 @@ shadow `report.py`. One site first.
 
 | Temptation | Where it actually belongs |
 |---|---|
-| "MCP so agents can call us" | I11, after O6 |
+| "MCP so agents can call us" | I11 (adapter exists; O6 still the proof) |
 | "Just implement CONTENT-005 with a keyword %" | Forbidden Kind A |
 | "Put PSI in crawl.js" | Forbidden; that is I4's reason to exist |
 | "Engine writes to WordPress" | Forbidden; I6 drafts only |

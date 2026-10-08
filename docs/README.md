@@ -22,7 +22,7 @@ Then:
 | [design/versioning.md](design/versioning.md) | Accepted compatibility policy (0.x treated like 1.x; pin `>=0.1,<0.2` on 0.1.x; CHANGELOG lists standard-ID and crawl-contract deltas). |
 | [design/profile-migration.md](design/profile-migration.md) | Moving `auto-ps-seo-audit` and `sevasek-com-seo-audit` onto this package. |
 | [design/blocked-rules.md](design/blocked-rules.md) | When a blocked row may become a real check, and when it must stay a stub. |
-| [design/mcp.md](design/mcp.md) | MCP server — deferred until the Skill-only path has been used for real. |
+| [design/mcp.md](design/mcp.md) | MCP server — thin host adapter (`seo-geo-mcp`); CLI remains equivalent. |
 
 The design docs exist because those features have real trade-offs; they
 are not a backlog of tickets. SYSTEM.md names the infrastructure; the
