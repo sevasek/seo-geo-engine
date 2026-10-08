@@ -7,24 +7,26 @@ runtime compatibility canary via the rest of this suite
 
 from __future__ import annotations
 
+import re
 import tomllib
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
-def test_changelog_exists_mentions_0_1_0_and_matches_pyproject():
+def test_changelog_has_a_section_for_the_package_version():
     changelog_path = REPO_ROOT / "CHANGELOG.md"
     assert changelog_path.is_file(), "CHANGELOG.md must exist at the repo root"
     changelog = changelog_path.read_text(encoding="utf-8")
-    assert "0.1.0" in changelog
+    assert "0.1.0" in changelog, "history must keep the initial extract"
 
     pyproject = tomllib.loads(
         (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
     )
     version = pyproject["project"]["version"]
-    assert version == "0.1.0"
-    assert version in changelog
+    assert re.search(
+        rf"^## \[{re.escape(version)}\]", changelog, flags=re.MULTILINE
+    ), f"CHANGELOG.md must have a ## [{version}] section matching pyproject"
 
 
 def test_versioning_policy_names_semver_for_pinned_profiles():
@@ -34,3 +36,4 @@ def test_versioning_policy_names_semver_for_pinned_profiles():
     for token in ("MAJOR", "MINOR", "PATCH", "profile"):
         assert token in policy, f"versioning policy must mention {token!r}"
     assert ">=0.1,<0.2" in policy
+    assert ">=0.2,<0.3" in policy

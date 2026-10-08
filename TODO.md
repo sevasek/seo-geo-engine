@@ -23,19 +23,29 @@ re-verify loop through 5 tool calls. A `git tag` exists for every version a
 profile might pin to, and a one-page policy says what changes require a
 major bump.
 
-## 0. Cut the first release (blocks everything below)
+## 0. Cut releases (a pin a profile can install)
 
-- [ ] **0.1 Tag and push `v0.1.0`.** `git tag v0.1.0 && git push origin v0.1.0`.
-      **Test:** in a scratch dir, `pip install git+https://github.com/sevasek/seo-geo-engine.git@v0.1.0`
-      into a fresh venv, then `python3 -c "import seo_geo_engine; print('ok')"`.
+- [x] **0.1 Tag and push `v0.1.0`.** Already on origin (`02b3d9a`, the
+      extract before Phases 1–4). **Test (2026-09-20):** isolated
+      `pip install --target … git+https://github.com/sevasek/seo-geo-engine.git@v0.1.0`
+      then `import seo_geo_engine` succeeds; `seo_geo_engine.run` is
+      absent (that module is 0.2.0).
+- [ ] **0.2 Tag and push `v0.2.0` after the 0.2.0 version bump is on
+      `main`.** `git tag v0.2.0 && git push origin v0.2.0`. This is the
+      first tag that includes `seo-geo-run` / `seo-geo-plan-sync` /
+      `seo-geo-enrich` / `seo-geo-verify`. **Test:** same isolated
+      install against `@v0.2.0`, then
+      `python3 -c "import seo_geo_engine.run, seo_geo_engine.verify; print('ok')"`.
+      Do not move the `v0.1.0` tag.
 
 ## A. Migrate `auto-ps-seo-audit` onto the engine
 
 Do these in order — each is independently testable, so a bad step is caught
 before the next one compounds it.
 
-- [ ] **A1. Add the profile skeleton.** Depend on `seo-geo-engine @ v0.1.0`
-      (pip line in `requirements-dev.txt`). Write `site.yaml` from the real
+- [ ] **A1. Add the profile skeleton.** Depend on `seo-geo-engine @ v0.2.0`
+      (pip line in `requirements-dev.txt` — 0.1.0 is the extract without
+      plan-sync / run / verify). Write `site.yaml` from the real
       facts already hardcoded in `seo_checks/helpers.py`
       (`service_page_pattern: "/services/"`, `service_index_url`),
       `seo_checks/linking_checks.py` (`CLUSTERS` → `entity_clusters`),
@@ -127,7 +137,12 @@ URL/org name).
 - [ ] B6. Delete the dead engine copy (see A6)
 - [ ] B7. Update the docs (see A7)
 
-## C. MCP server (net-new code, not a migration)
+## C. MCP server (deferred until a real-site verified flip)
+
+Do not start this section to look complete. [docs/PLAN.md](docs/PLAN.md)
+Phase 6 and [docs/design/mcp.md](docs/design/mcp.md) wait on a Skill-only
+loop closing an item on a migrated profile (O6). If that never happens,
+skip C indefinitely.
 
 - [ ] **C1. Confirm the `mcp` PyPI package name/API** the
       `pyproject.toml` `mcp>=1.0` extra assumes is still correct — read
@@ -157,15 +172,15 @@ URL/org name).
       contract, or a CLI flag; MINOR = new engine-default
       checks/standard rows; PATCH = bugfixes with no contract change.
       0.x is treated like 1.x. Every release's `CHANGELOG.md` names
-      what a pinned profile must change. Profiles pin
-      `seo-geo-engine>=0.1,<0.2`.
-      **Test:** `tests/test_versioning.py` — CHANGELOG matches
-      `pyproject.toml` version; policy file mentions MAJOR/MINOR/PATCH
-      and "profile".
+      what a pinned profile must change. Current pin
+      `seo-geo-engine>=0.2,<0.3` (0.1.x is the extract).
+      **Test:** `tests/test_versioning.py` — CHANGELOG has a `## [version]`
+      section matching `pyproject.toml`.
 
 ## Definition of done for the whole backlog
 
-- [ ] `v0.1.0` tag pushed, installs cleanly from git in a scratch venv
+- [x] `v0.1.0` tag pushed, installs cleanly from git (extract only)
+- [ ] `v0.2.0` tag pushed, installs cleanly and imports `seo_geo_engine.run`
 - [ ] `auto-ps-seo-audit`: `pytest` green, report output for the real
       2026-08-31 crawl unchanged for every shared ID, repo down to ~6
       profile-specific files

@@ -190,8 +190,8 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
       [docs/design/profile-migration.md](docs/design/profile-migration.md).
 - [ ] Same migration for `sevasek-com-seo-audit`.
 - [x] Engine versioning/compatibility policy — 0.x is treated like 1.x
-      for compatibility; profiles pin `seo-geo-engine>=0.1,<0.2`; the
-      public API is crawl JSON + check ID semantics + `@check`/
+      for compatibility; current profiles pin `seo-geo-engine>=0.2,<0.3`;
+      the public API is crawl JSON + check ID semantics + `@check`/
       `@remediate` signatures. See
       [docs/design/versioning.md](docs/design/versioning.md) and
       [CHANGELOG.md](CHANGELOG.md). Not on PyPI; `1.0.0` waits on a
@@ -199,18 +199,20 @@ examples/sample-profile/       — synthetic worked example, not a real dependen
 
 ## Versioning
 
-Package version is **0.1.0**. During 0.x we treat compatibility like
-1.x: do not casually break profiles. Profiles pin
+Package version is **0.2.0**. During 0.x we treat compatibility like
+1.x: do not casually break profiles. Profiles that want the current
+operator path (`seo-geo-run`, plan-sync, enrich, verify) pin
 
 ```
-seo-geo-engine>=0.1,<0.2
+seo-geo-engine>=0.2,<0.3
 ```
 
-The public API is the crawl JSON, check ID semantics, and the
+The `v0.1.0` tag remains the initial extract (`>=0.1,<0.2`). The
+public API is the crawl JSON, check ID semantics, and the
 `@check` / `@remediate` function signatures — not only the Python
 modules. Every release's `CHANGELOG.md` entry lists standard IDs
 added, removed, or reweighted; crawl-contract field changes; and
-profile migration notes. `examples/sample-profile/` is the 0.1.x
+profile migration notes. `examples/sample-profile/` is the 0.2.x
 compatibility canary (`pytest` in this repo runs it).
 
 This package is not published to PyPI yet (editable install + git tag

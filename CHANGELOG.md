@@ -26,7 +26,35 @@ the heading is not.
 
 ## [Unreleased]
 
-Work landed after the `v0.1.0` tag (still package version 0.1.0).
+### Added
+
+None.
+
+### Standard IDs added
+
+None.
+
+### Standard IDs removed
+
+None.
+
+### Standard IDs reweighted
+
+None.
+
+### Crawl-contract field changes
+
+None.
+
+### Migration notes for profiles
+
+None.
+
+## [0.2.0] - 2026-09-20
+
+MINOR. New CLIs and engine-owned remediations after the `v0.1.0` extract.
+No default standard IDs added, removed, or reweighted. Check verdict
+semantics unchanged.
 
 ### Added
 
@@ -36,9 +64,10 @@ Work landed after the `v0.1.0` tag (still package version 0.1.0).
 - `seo-geo-enrich` post-crawl merge of PageSpeed Insights (mobile lab LCP/CLS)
   and Search Console sitemap status. Optional extra: `[enrich]`.
 - Compatibility policy: `docs/design/versioning.md` (accepted). 0.x treated
-  like 1.x; profiles pin `seo-geo-engine>=0.1,<0.2`.
+  like 1.x.
 - `seo-geo-run` (crawl → optional enrich → report → plan-sync → queue → HTML)
   and `seo-geo-verify` (diff two report JSONs; `--id`, `--require-not-worse`).
+- `docs/SYSTEM.md` — goals, infrastructures, and how they join.
 
 ### Standard IDs added
 
@@ -59,6 +88,9 @@ None in the crawler. `pageSpeed` and `searchConsole` are now produced by
 
 ### Migration notes for profiles
 
+- Pin `seo-geo-engine>=0.2,<0.3` to take this MINOR (new commands and
+  engine remediations). Profiles still on `>=0.1,<0.2` stay on the
+  extract and will not see `seo-geo-run` / `seo-geo-plan-sync`.
 - After upgrade, run `seo-geo-plan-sync` so engine-owned remediations
   populate `remediation-plan.md`.
 - Optional: `pip install seo-geo-engine[enrich]` and `seo-geo-enrich` if
@@ -143,5 +175,6 @@ when present.
   without a fixture update is either a real break or an incomplete
   commit.
 
-[Unreleased]: https://github.com/sevasek/seo-geo-engine/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/sevasek/seo-geo-engine/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/sevasek/seo-geo-engine/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/sevasek/seo-geo-engine/releases/tag/v0.1.0
